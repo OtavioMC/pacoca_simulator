@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendedor de Paçoca Simulator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;--border2:#4b5563;--text:#e2e8f0;--text2:#9ca3af;--text3:#6b7280;--acc:#f59e0b;--blue:#60a5fa;--green:#22c55e;--red:#ef4444;--purple:#a855f7}
+html{height:100%}
+body{font-family:'VT323',monospace;background:var(--bg);color:var(--text);font-size:16px;min-height:100vh;max-width:660px;margin:0 auto;overflow-x:hidden}
+.screen{display:none}.screen.active{display:block}
+h1{font-size:28px;color:var(--acc);text-align:center;margin-bottom:4px}
+h2{font-size:19px;color:var(--blue);margin-bottom:8px}
+.px{padding:14px 16px}
+.box{border:1px solid var(--border);padding:10px;margin:5px 0;background:var(--bg2);border-radius:5px}
+.box.red{border-color:var(--red)}.box.green{border-color:var(--green)}.box.yellow{border-color:var(--acc)}
+button{font-family:'VT323',monospace;font-size:16px;padding:6px 10px;border:1px solid var(--border2);background:var(--bg2);color:var(--blue);cursor:pointer;margin:2px;border-radius:4px}
+button:hover{background:var(--bg3);color:#fff}button:active{transform:scale(0.97)}button:disabled{opacity:0.3;cursor:not-allowed}
+button.g{border-color:var(--green);color:var(--green)}button.g:hover{background:var(--green);color:#000}
+button.r{border-color:var(--red);color:var(--red)}button.r:hover{background:var(--red);color:#fff}
+button.y{border-color:var(--acc);color:var(--acc)}button.y:hover{background:var(--acc);color:#000}
+button.p{border-color:var(--purple);color:var(--purple)}button.p:hover{background:var(--purple);color:#fff}
+button.orange{border-color:#f97316;color:#f97316}button.orange:hover{background:#f97316;color:#000}
+.bar{height:9px;background:var(--bg3);border-radius:3px;margin:3px 0;overflow:hidden}
+.bfill{height:100%;border-radius:3px;transition:width 0.4s}
+.hp{background:var(--green)}.hp.low{background:var(--red)}.bar-acc{background:var(--acc)}.bar-time{background:var(--blue)}
+.row{display:flex;justify-content:space-between;font-size:14px;margin:3px 0;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:5px 0}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin:5px 0}
+.need{padding:7px 4px;text-align:center;border:1px solid var(--border);border-radius:4px;font-size:14px;line-height:1.4}
+.need.ok{border-color:var(--green);color:var(--green);background:#0a1f10}
+.need.bad{border-color:var(--red);color:var(--red);background:#1f0a0a}
+.logbox{background:#090e14;border:1px solid var(--bg3);padding:9px;height:120px;overflow-y:auto;font-size:13px;border-radius:4px;margin-top:6px}
+.le{margin-bottom:3px;line-height:1.5}.le.bad{color:#f87171}.le.good{color:#4ade80}.le.info{color:var(--blue)}.le.warn{color:var(--acc)}
+.tab-bar{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+.tab{padding:6px 14px;border:1px solid var(--border);cursor:pointer;font-size:15px;color:var(--text3);border-radius:4px}
+.tab.on{border-color:var(--blue);color:var(--blue);background:#0d1f3c}
+.alloc{display:flex;align-items:center;gap:8px;margin:5px 0;padding:7px;background:var(--bg3);border-radius:4px}
+.alloc .lbl{flex:1;font-size:14px;color:var(--text2)}
+.alloc .v{width:26px;text-align:center;color:var(--acc);font-size:18px}
+.alloc button{padding:2px 9px;margin:0;font-size:15px}
+.mwrap{background:#1a0a2e;border:2px solid var(--purple);padding:14px;margin:6px 0;border-radius:6px;display:none}
+.mwrap.on{display:block}
+.mwrap h3{color:#a78bfa;font-size:17px;margin-bottom:6px}
+.mwrap p{font-size:13px;color:#c4b5fd;line-height:1.8;margin-bottom:8px;white-space:pre-line}
+.mwrap.gm{background:#0a1a0d;border-color:var(--green)}
+.mwrap.gm h3{color:#4ade80}.mwrap.gm p{color:#86efac}
+.sitem{display:flex;justify-content:space-between;align-items:center;padding:9px;border:1px solid var(--border);margin:4px 0;background:#090e14;border-radius:4px;font-size:13px;gap:8px}
+.sitem .info{flex:1;min-width:0}.sitem .info .name{color:var(--text);font-size:15px;margin-bottom:2px}.sitem .info .desc{color:var(--text3);font-size:12px;line-height:1.5}
+.coach-box{background:#1a0a2e;border:1px solid var(--purple);padding:10px;margin:6px 0;font-size:13px;color:#c084fc;border-radius:5px}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:5px 0}
+.sc{background:#090e14;padding:8px;border:1px solid var(--bg3);border-radius:4px}
+.sc .lb{color:var(--text3);font-size:12px;margin-bottom:2px}.sc .vl{color:var(--text);font-size:18px;font-weight:bold}
+.briefing{background:var(--bg3);border-radius:8px;padding:12px;margin:6px 0;border:1px solid var(--border2)}
+.brief-npc{display:flex;gap:12px;align-items:flex-start;margin-bottom:8px}
+.brief-av{width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;border:2px solid var(--border2);background:var(--bg2);flex-shrink:0}
+.brief-info{flex:1;min-width:0}
+.brief-name{font-size:15px;color:var(--acc);margin-bottom:2px}
+.brief-ctx{font-size:12px;color:var(--text3);line-height:1.6}
+.brief-speech{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:14px;line-height:1.6;color:var(--text2);margin-top:6px}
+.brief-opts{margin-top:8px}
+.header-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.intim-info{background:#1f0a0a;border:1px solid var(--red);border-radius:4px;padding:5px 9px;font-size:13px;color:#f87171;margin:4px 0}
+.tornozeleira-bar{background:#1f1000;border:1px solid #f97316;border-radius:4px;padding:5px 9px;font-size:13px;color:#f97316;margin:4px 0;display:none}
+.time-warn{background:#1f1a0a;border:1px solid var(--acc);border-radius:4px;padding:5px 9px;font-size:13px;color:var(--acc);margin:4px 0;display:none}
+.last-act-warn{background:#1f0505;border:2px solid var(--red);border-radius:4px;padding:6px 10px;font-size:13px;color:var(--red);margin:4px 0;display:none;animation:pulse 1s infinite}
+.pacoca-badge{display:inline-flex;align-items:center;gap:4px;background:#2d1a05;border:1px solid #8B5E0A;border-radius:6px;padding:3px 10px;font-size:15px}
+.go-screen{padding:18px 20px;text-align:center}
+.go-icon-big{font-size:56px;margin:10px 0;line-height:1}
+.go-title{color:var(--red);font-size:26px;margin-bottom:8px}
+.go-story{text-align:left;font-size:13px;line-height:2;margin:8px 0;padding:10px;border-radius:5px;background:var(--bg2)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.55}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.shake{animation:shake 0.4s ease}
+@keyframes flash{0%,100%{background:var(--bg)}50%{background:#3f0000}}
+.flash-red{animation:flash 0.3s ease 3}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="s-title" class="screen active px" style="text-align:center;padding-top:10px">
+  <h1>VENDEDOR DE PAÇOCA<br>SIMULATOR</h1>
+  <div class="coach-box" style="text-align:left;margin:8px 0 4px">
+    <div style="margin-bottom:4px;color:var(--purple)">💼 Coach Thiago Finotti diz:</div>
+    <div style="color:#e9d5ff">"TRABALHE ENQUANTO ELES DORMEM! AVANCE ENQUANTO ELES SE DIVERTEM!"</div>
+  </div>
+  <div style="font-size:64px;margin:8px 0;filter:drop-shadow(0 0 8px #92400e)">🥜</div>
+  <div style="margin:10px auto;display:inline-block;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.35);border-radius:6px;padding:8px 20px">
+    <div style="font-size:10px;color:var(--text3);letter-spacing:2px;margin-bottom:2px">META</div>
+    <div style="font-family:'VT323',monospace;font-size:24px;color:var(--acc);letter-spacing:1px">R$ 1.000.000,00</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:1px">...ou pelo menos sobreviver</div>
+  </div>
+  <div class="coach-box" style="text-align:left;margin:10px 0">
+    <div style="margin-bottom:4px;color:var(--purple)">💼 Coach Thiago Finotti — "Do Nada ao Topo":</div>
+    <div style="color:#e9d5ff">"QUALQUER UM PODE ENRIQUECER VENDENDO PAÇOCA! SÓ DEPENDE DE VOCÊ! 🚀🔥"</div>
+  </div>
+  <button class="g" onclick="novoJogo()" style="padding:10px 28px;font-size:16px">► NOVO JOGO</button>
+  <div id="title-continue" style="display:none;margin-top:8px">
+    <button class="y" onclick="carregarJogo()" style="padding:10px 28px;font-size:16px">💾 CONTINUAR</button>
+    <div id="title-save-info" style="font-size:11px;color:var(--text3);margin-top:4px"></div>
+  </div>
+  <div style="color:var(--bg3);font-size:11px;margin-top:10px">v1.2</div>
+</div>
+
+<div id="s-create" class="screen px">
+  <h2>► CRIAR PERSONAGEM</h2>
+  <div class="box">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:6px">Distribua 12 pontos:</div>
+    <div style="text-align:center;color:var(--acc);font-size:16px;margin-bottom:10px">Restantes: <span id="pts">12</span></div>
+    <div class="alloc"><div class="lbl">💬 Carisma<br><span style="font-size:10px;color:var(--text3)">chance de negociação</span></div><button onclick="adj('car',-1)">-</button><div class="v" id="vc">0</div><button onclick="adj('car',1)">+</button></div>
+    <div class="alloc"><div class="lbl">✨ Aparência<br><span style="font-size:10px;color:var(--text3)">vendas automáticas</span></div><button onclick="adj('apr',-1)">-</button><div class="v" id="va">0</div><button onclick="adj('apr',1)">+</button></div>
+    <div class="alloc"><div class="lbl">⚡ Agilidade<br><span style="font-size:10px;color:var(--text3)">ações custam menos tempo</span></div><button onclick="adj('agi',-1)">-</button><div class="v" id="ag">0</div><button onclick="adj('agi',1)">+</button></div>
+  </div>
+  <div class="box" style="font-size:11px;color:var(--text2);line-height:2;border-color:var(--blue)">
+    ⏰ 08:00 → 00:00. Agilidade 0 = ações muito lentas.<br>
+    Uma última ação permitida após meia-noite, depois dorme forçado.<br>
+    🏚 Barraca furada de sem-teto · 💰 R$0
+  </div>
+  <button class="g" onclick="startGame()" id="btn-st" disabled style="width:100%;padding:10px;font-size:15px;margin-top:6px">► COMEÇAR A SOFRER</button>
+</div>
+
+<div id="s-game" class="screen">
+  <div class="header-bar">
+    <div>
+      <div style="font-size:14px;color:var(--text)">DIA <span id="g-day">1</span> · <span id="g-clock" style="color:var(--acc)">08:00</span></div>
+      <div style="font-size:11px;color:var(--text3)">Livre: <span id="g-timeleft" style="color:var(--blue)">16h 0min</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button id="mute-btn" onclick="toggleMute()" style="font-size:16px;padding:3px 8px">🔊</button>
+      <div style="text-align:right">
+        <div style="font-size:18px;color:var(--acc);font-weight:bold">R$ <span id="g-money">0,00</span></div>
+        <div style="font-size:12px;color:#d97706;margin-top:2px;display:flex;align-items:center;gap:4px">
+          <span style="font-size:18px;line-height:1">🥜</span>
+          <span><b id="g-pac">0</b> <span style="font-size:10px;color:var(--text3)">paçocas</span></span>
+        </div>
+        <div style="font-size:9px;color:var(--border2);letter-spacing:1px;margin-top:2px">meta: R$1.000.000</div>
+      </div>
+    </div>
+  </div>
+  <div class="px" style="padding-top:6px">
+    <div class="row" style="margin-bottom:2px"><span style="font-size:10px;color:var(--text3)">Dia (08:00→00:00)</span><span id="g-timeperc" style="font-size:10px;color:var(--text3)">0%</span></div>
+    <div class="bar" style="height:5px"><div class="bfill bar-time" id="g-timebar" style="width:0%"></div></div>
+    <div id="last-act-warn" class="last-act-warn">⚠ ÚLTIMA AÇÃO — depois você dorme automaticamente!</div>
+    <div id="time-warn" class="time-warn">⚠ Passando das <span id="tw-hour">22</span>:00! Corra pra casa!</div>
+    <div id="tornozeleira-bar" class="tornozeleira-bar">🦶 TORNOZELEIRA — Dívida: R$<span id="torn-debt">0</span></div>
+    <div id="chuva-bar" style="display:none;background:#0d1f3c;border:1px solid var(--blue);border-radius:4px;padding:4px 8px;font-size:12px;color:var(--blue);margin:3px 0">☔ CHUVA — ações externas custam +30min hoje</div>
+    <div id="prom-bar" style="display:none;background:#0a1f10;border:1px solid var(--green);border-radius:4px;padding:4px 8px;font-size:12px;color:var(--green);margin:3px 0">🍽 PROMOÇÃO — Comida por R$5 hoje!</div>
+    <div id="agiota-bar" style="display:none;background:#1f0a2e;border:1px solid var(--purple);border-radius:4px;padding:4px 8px;font-size:12px;color:#c084fc;margin:3px 0">🤑 DÍVIDA AGIOTA — R$<span id="agiota-debt">0</span> no fim do mês</div>
+
+    <div class="briefing" id="briefing-area">
+      <div id="brief-idle" style="display:flex;align-items:center;justify-content:center;height:60px;color:var(--text3);font-size:13px">Escolha uma ação...</div>
+      <div id="brief-active" style="display:none">
+        <div class="brief-npc">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+            <div class="brief-av" id="br-av">👤</div>
+            <div style="font-size:10px;text-align:center;max-width:64px" id="br-badge"></div>
+          </div>
+          <div class="brief-info">
+            <div class="brief-name" id="br-name"></div>
+            <div class="brief-ctx" id="br-ctx"></div>
+          </div>
+        </div>
+        <div class="brief-speech" id="br-speech"></div>
+        <div class="brief-opts" id="br-opts"></div>
+      </div>
+      <div id="brief-result" style="display:none">
+        <div class="brief-npc">
+          <div class="brief-av" id="br2-av">👤</div>
+          <div class="brief-info">
+            <div class="brief-name" id="br2-name"></div>
+            <div class="brief-speech" id="br2-speech" style="margin-top:4px"></div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px">
+          <div id="br2-result"></div>
+          <div id="br2-time" style="color:var(--blue)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row"><span style="color:var(--text3)">Saúde</span><span id="g-hp-n" style="font-size:12px">100/100</span></div>
+    <div class="bar"><div class="bfill hp" id="g-hp" style="width:100%"></div></div>
+    <div class="sg">
+      <div class="sc"><div class="lb">💬 Carisma</div><div class="vl" id="g-car">0</div></div>
+      <div class="sc"><div class="lb">✨ Aparência</div><div class="vl" id="g-apr">0</div></div>
+      <div class="sc"><div class="lb">⚡ Agilidade</div><div class="vl" id="g-agi">0</div></div>
+      <div class="sc"><div class="lb">🏠 Moradia</div><div class="vl" id="g-mor" style="font-size:11px">Barraca</div></div>
+    </div>
+    <div class="grid3">
+      <div class="need" id="n-com">🍽 Comida<br>❌</div>
+      <div class="need" id="n-ban">🚿 Banho<br>❌</div>
+      <div class="need" id="n-des">😴 Descanso<br>❌</div>
+    </div>
+    <div id="imundo-warn" style="display:none" class="box red">⚠ IMUNDO — aparência -1. Tome banho!</div>
+
+    <div class="tab-bar" style="margin-top:8px">
+      <div class="tab on" onclick="setTab('acoes')">AÇÕES</div>
+      <div class="tab" onclick="setTab('loja')">LOJA</div>
+      <div class="tab" onclick="setTab('status')">STATUS</div>
+    </div>
+
+    <div id="tab-acoes">
+      <div class="grid2">
+        <button onclick="iniciarBriefing('pedir')" id="btn-ped">🙏 Pedir dinheiro<br><span id="ph-ped" style="font-size:10px;color:var(--text3)"></span></button>
+        <button onclick="doAct('caixa')" id="btn-cx">📦 Comprar caixa<br><span id="ph-cx" style="font-size:10px;color:var(--text3)">R$15</span></button>
+        <button onclick="iniciarBriefing('vender','normal')" id="btn-vnd">🥜 Vender paçoca<br><span id="ph-vnd" style="font-size:10px;color:var(--text3)"></span></button>
+        <button onclick="doAct('comer')" id="btn-com">🍽 Comer<br><span id="ph-com" style="font-size:10px;color:var(--text3)">R$8 · 1h</span></button>
+        <button onclick="doAct('banho')" id="btn-ban">🚿 Banho<br><span id="ph-ban" style="font-size:10px;color:var(--text3)">30min</span></button>
+        <button onclick="doAct('dormir')" id="btn-dor">😴 Dormir<br><span style="font-size:10px;color:var(--green)">Encerra o dia</span></button>
+      </div>
+      <button onclick="doAct('comer_pacoca')" id="btn-cpac" style="width:100%;margin-top:4px;display:none;border-color:#92400e;color:#d97706">🥜 Comer paçoca normal (20 un.)<br><span style="font-size:10px;color:var(--text3)">Mata fome · -5 HP · não é saudável</span></button>
+      <button onclick="iniciarBriefing('vender','caseira')" id="btn-vnd-cas" style="width:100%;margin-top:3px;display:none;border-color:#a16207;color:#fbbf24">🥘 Vender paçoca caseira<br><span id="ph-vnd-cas" style="font-size:10px;color:var(--text3)">R$2,00</span></button>
+      <button onclick="iniciarBriefing('vender','turbinada')" id="btn-vnd-turb" style="width:100%;margin-top:3px;display:none;border-color:#7f1d1d;color:#f87171">⚪ Vender "cocada boa"<br><span id="ph-vnd-turb" style="font-size:10px;color:var(--text3)">R$35,00 · amostra grátis pros novos</span></button>
+      <div id="intim-info" class="intim-info" style="display:none">😤 Intimidações: <span id="ic">0</span> · Prisão: <span id="ir">~1%</span></div>
+      <div id="coach-pop" class="coach-box" style="display:none"></div>
+      <div id="ent-btn" style="display:none;margin-top:6px"><button class="p" onclick="abrirEnt()" style="width:100%;font-size:13px">📋 Entrevista no Milionário Super-Mercado</button></div>
+    </div>
+
+    <div id="tab-loja" style="display:none">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">💰 Saldo: R$ <span id="lj-money">0,00</span></div>
+      <div id="loja-items"></div>
+    </div>
+
+    <div id="tab-status" style="display:none;font-size:12px">
+      <div class="box"><div style="color:var(--acc);margin-bottom:3px">MORADIA</div><div id="st-mor" style="color:var(--text2)">🏚 Barraca furada de sem-teto</div></div>
+      <div class="box"><div style="color:var(--acc);margin-bottom:3px">FINANÇAS</div>
+        <div class="row"><span>Saldo:</span><span id="st-money2" style="color:var(--acc)">R$0,00</span></div>
+        <div class="row" id="st-divida-row" style="display:none"><span>Dívida banco:</span><span id="st-divida" style="color:var(--red)"></span></div>
+        <div class="row" id="st-parc-row" style="display:none"><span>Parcela (mês <span id="st-parc-mes"></span>):</span><span id="st-parc" style="color:var(--red)"></span></div>
+        <div class="row" id="st-missedrow" style="display:none"><span>Parcelas em atraso:</span><span id="st-missed" style="color:var(--red)"></span></div>
+      </div>
+      <div class="box"><div style="color:var(--acc);margin-bottom:3px">ATRIBUTOS (atual/base)</div>
+        <div class="row"><span>Carisma:</span><span id="st-car-b">0/0</span></div>
+        <div class="row"><span>Aparência:</span><span id="st-apr-b">0/0</span></div>
+        <div class="row"><span>Agilidade:</span><span id="st-agi-b">0/0</span></div>
+      </div>
+      <div class="box"><div style="color:var(--acc);margin-bottom:3px">LINKEDIN</div>
+        <div id="st-linkedin" style="color:var(--blue);font-size:13px">🥜 Microempreendedor Paçoca S.A.</div>
+        <div id="st-vendaTotal" style="font-size:11px;color:var(--text3);margin-top:2px">Vendas totais: R$0,00</div>
+      </div>
+      <div class="box"><div style="color:var(--acc);margin-bottom:3px">PENALIDADES</div><div id="st-pen" style="color:var(--red);line-height:1.9">Nenhuma</div></div>
+      <div class="box">
+        <div style="color:var(--acc);margin-bottom:3px">PROGRESSO</div>
+        <div class="row"><span>Meta R$1.000.000</span><span id="st-pct" style="color:var(--acc)">0.0000%</span></div>
+        <div class="bar"><div class="bfill bar-acc" id="st-bar" style="width:0%"></div></div>
+        <div class="row" style="margin-top:5px"><span>Kitnet:</span><span id="st-kit">Não</span></div>
+        <div class="row"><span>Apto:</span><span id="st-quit">Não</span></div>
+        <div class="row"><span>Entrevista:</span><span id="st-ent">Não</span></div>
+      </div>
+      <div class="box"><div style="color:var(--acc);margin-bottom:3px">DIAS SEM</div>
+        <div class="row"><span>Comer:</span><span id="st-dc" style="color:var(--red)">0</span></div>
+        <div class="row"><span>Banho:</span><span id="st-db" style="color:var(--red)">0</span></div>
+        <div class="row"><span>Descanso:</span><span id="st-dd" style="color:var(--red)">0</span></div>
+      </div>
+    </div>
+    <div class="logbox" id="logbox"></div>
+  </div>
+</div>
+
+<div id="s-endday" class="screen px">
+  <h2>► FIM DO DIA <span id="ed-day">1</span></h2>
+  <div class="box yellow" id="ed-rep"></div>
+  <div class="box red" id="ed-pen" style="display:none"></div>
+  <div id="ed-coach" class="coach-box" style="display:none"></div>
+  <button class="g" onclick="nextDay()" style="width:100%;padding:10px;font-size:15px;margin-top:8px">► Próximo Dia</button>
+</div>
+
+<div id="s-over" class="screen go-screen">
+  <div class="go-icon-big" id="go-icon">😵</div>
+  <div class="go-title" id="go-title">GAME OVER</div>
+  <div class="go-story box red" id="go-msg"></div>
+  <div class="coach-box" style="font-size:clamp(10px,2.8vw,12px)">"Você simplesmente não quis o suficiente. 🚀" — Coach Thiago Finotti</div>
+  <button class="g" onclick="resetGame()" style="width:100%;padding:10px;font-size:clamp(13px,3.5vw,15px);margin-top:10px">► Tentar de Novo</button>
+</div>
+
+<!-- Tela específica: resistiu à prisão -->
+<div id="s-over-resist" class="screen go-screen">
+  <div class="go-icon-big">🚔💥</div>
+  <div class="go-title">ABATIDO</div>
+  <div class="go-story box red">
+    Você decidiu resistir à abordagem policial.<br><br>
+    Não durou nem dez segundos.<br><br>
+    O agente não perdeu tempo.<br><br>
+    <span style="color:var(--text3)">O Coach Finotti, ao saber da notícia, postou:<br><em>"Às vezes o universo fecha uma porta... mas isso, meu amigo, não era uma porta. Era uma parede. 🚀"</em></span>
+  </div>
+  <div style="font-size:clamp(10px,2.8vw,12px);color:var(--text3);margin:6px 0">Saldo final: R$<span id="resist-saldo">0,00</span></div>
+  <button class="g" onclick="resetGame()" style="width:100%;padding:10px;font-size:clamp(13px,3.5vw,15px);margin-top:8px">► Tentar de Novo</button>
+</div>
+
+<!-- Tela específica: executado com tornozeleira -->
+<div id="s-over-torn" class="screen go-screen">
+  <div class="go-icon-big">🦶🔫</div>
+  <div class="go-title" style="color:#f97316">EXECUTADO</div>
+  <div class="go-story" style="border:1px solid #f97316;border-radius:5px;background:#1f1000;color:#fdba74">
+    Você foi preso usando tornozeleira eletrônica.<br><br>
+    Os policiais reconheceram o monitoramento.<br>Levaram você pro fundo da delegacia.<br><br>
+    O que aconteceu depois não consta em nenhum relatório oficial.<br><br>
+    <span style="color:var(--text3)">Crime: <span id="torn-crime">—</span><br>Dívida restante: R$<span id="torn-divida">0,00</span></span>
+  </div>
+  <div class="coach-box" style="font-size:clamp(10px,2.8vw,12px);margin-top:6px">
+    Coach Finotti, no velório hipotético: <em>"A tornozeleira era só um obstáculo. Faltou mindset. 🚀"</em>
+  </div>
+  <button class="g" onclick="resetGame()" style="width:100%;padding:10px;font-size:clamp(13px,3.5vw,15px);margin-top:8px">► Tentar de Novo</button>
+</div>
+
+<div id="s-win" class="screen px" style="text-align:center">
+  <div style="font-size:44px;margin:10px 0;animation:floatnut 2s ease-in-out infinite">🏆</div>
+
+  <div style="font-family:'VT323',monospace;font-size:clamp(22px,6vw,32px);color:var(--green);text-shadow:0 0 16px rgba(34,197,94,0.5);margin-bottom:4px;letter-spacing:1px">
+    PARABÉNS!<br>VOCÊ É UM MILIONÁRIO!*
+  </div>
+  <div style="font-size:10px;color:var(--text3);margin-bottom:12px;letter-spacing:1px">*os asteriscos são importantes</div>
+
+  <!-- FAKE TROPHY BOX -->
+  <div style="background:linear-gradient(135deg,rgba(34,197,94,0.12),rgba(34,197,94,0.04));border:2px solid var(--green);border-radius:8px;padding:16px;margin:8px 0;text-align:left">
+    <div style="font-family:'VT323',monospace;font-size:18px;color:var(--green);letter-spacing:2px;margin-bottom:10px">🎉 CONQUISTAS DESBLOQUEADAS:</div>
+    <div style="font-size:12px;line-height:2.2;color:var(--text2)">
+      <div style="color:var(--green)">✅ Conseguiu um emprego <strong style="color:var(--text)">6x1 no MILIONÁRIO SUPER-MERCADO!!!</strong></div>
+      <div style="color:var(--green)">✅ Desbloqueou o <strong style="color:var(--text)">INCRÍVEL SALÁRIO MÍNIMO E ESTABILIDADE!</strong></div>
+      <div style="color:var(--green)">✅ Ganhou o direito de <strong style="color:var(--text)">trabalhar feriado com adicional</strong></div>
+      <div style="color:var(--green)">✅ Tem agora <strong style="color:var(--text)">carteira assinada</strong> (parabéns, você é raro)</div>
+    </div>
+  </div>
+
+  <!-- SALARY BOX -->
+  <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:14px;margin:8px 0;text-align:left">
+    <div style="font-family:'VT323',monospace;font-size:14px;color:var(--acc);letter-spacing:1px;margin-bottom:8px">💰 SEU HOLERITE MILIONÁRIO:</div>
+    <div style="font-size:12px;line-height:2.2;color:var(--text2)">
+      <div class="row"><span>Salário bruto</span><span style="color:var(--text)">R$ 1.412,00</span></div>
+      <div class="row"><span>INSS (7,5%)</span><span style="color:var(--red)">- R$ 105,90</span></div>
+      <div class="row"><span>Vale transporte</span><span style="color:var(--text)">R$ 0,00 <span style="color:var(--text3);font-size:10px">(vai de ônibus mesmo)</span></span></div>
+      <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px" class="row"><span style="font-weight:bold;color:var(--text)">Salário líquido</span><span style="color:var(--acc);font-family:'VT323',monospace;font-size:16px">R$ 1.306,10</span></div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px">÷ 26 dias úteis = R$ 50,23/dia &nbsp;·&nbsp; ÷ 8h = R$ 6,28/hora</div>
+    </div>
+  </div>
+
+  <!-- BOSS QUOTE -->
+  <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:14px;margin:8px 0;text-align:left;font-size:12px;color:#fca5a5;line-height:1.9">
+    <div style="color:var(--red);font-family:'VT323',monospace;font-size:14px;margin-bottom:6px">👔 SEU CHEFE (ex-Coach Finotti) DIZ:</div>
+    <em>"Viu como é fácil?! Você mesmo tava vendendo paçoca na rua há pouco tempo. Agora olha só — carteira assinada! Pode sorrir, agora <strong style="color:#fca5a5">faça muitas horas extras</strong> e você vai poder chegar ao seu <strong style="color:#fca5a5">VERDADEIRO POTENCIAL!</strong>"</em><br><br>
+    <em>"Ah, e o corredor 7 não vai repor sozinho. Começa às 6h amanhã. Sem atraso."</em>
+  </div>
+
+  <!-- FINE PRINT -->
+  <div style="font-size:10px;color:var(--text3);margin:10px 0;line-height:2;text-align:left;background:var(--bg3);border-radius:6px;padding:10px">
+    <strong style="color:var(--border2)">*NOTA IMPORTANTE:</strong> O objetivo declarado era R$1.000.000,00.
+    Você acumulou uma fração de 0,0001% disso e achou que era vitória.
+    Tecnicamente, você está certo. Dentro do contexto desta vida, isto
+    <em>é</em> uma vitória. O jogo não vai te julgar por isso.
+  </div>
+
+  <!-- ENDING NARRATION -->
+  <div style="font-size:12px;color:var(--text3);margin:12px 0;line-height:2.4;font-style:italic">
+    Você olha pro teto da kitnet no primeiro dia de folga.<br>
+    A conta de luz venceu ontem.<br>
+    Você sorri mesmo assim.<br>
+    <span style="color:var(--text2)">Dorme com a barriga cheia pela primeira vez em semanas.</span>
+  </div>
+
+  <button class="g" onclick="resetGame()" style="width:100%;padding:10px;font-size:clamp(13px,3.5vw,15px);margin-top:4px">► Jogar Novamente (e talvez desta vez chegar ao milhão)</button>
+</div>
+
+<div id="mod" class="mwrap px"><h3 id="mod-t">Aviso</h3><p id="mod-b"></p><div id="mod-x"></div><button onclick="closeModal()" style="width:100%;margin-top:4px;font-size:13px">► OK</button></div>
+<div id="entm" class="mwrap gm px"><h3>📋 Entrevista — Milionário Super-Mercado</h3><p id="ent-b"></p><button class="g" onclick="fazerEnt()" style="width:100%;margin-bottom:4px;font-size:13px">► Fazer a Entrevista</button><button onclick="fecharEnt()" style="width:100%;font-size:13px">► Voltar</button></div>
+</div>
+
+<script>
+const DAY_START=8*60,DAY_END=24*60,DAY_WARN=22*60;
+function minToHHMM(m){const h=Math.floor(m/60)%24,mm=m%60;return String(h).padStart(2,'0')+':'+String(mm).padStart(2,'0');}
+function timeLeft(m){const r=DAY_END-m;if(r<=0)return '0h 0min';return Math.floor(r/60)+'h '+(r%60)+'min';}
+function timePerc(m){return Math.min(((m-DAY_START)/(DAY_END-DAY_START))*100,100);}
+function actCost(base,isRua,minOverride){
+  const agi=typeof G!=='undefined'?G.agi:0;
+  let mult;
+  if(agi>=0){mult=agi===0?2.5:Math.max(1-agi*0.15,0.25);}
+  else{mult=2.5+Math.abs(agi)*0.5;}
+  let c=Math.round(base*mult);
+  if(typeof G!=='undefined'&&G.chuva&&isRua)c+=30;
+  const bik=typeof G!=='undefined'?G.bikBonus:0;
+  if(isRua&&bik)c=Math.max(c-bik,minOverride||5);
+  return Math.max(c,minOverride||5);
+}
+// Helpers com mínimos específicos
+function actCostPedir(){return actCost(90,true,10);}
+function actCostVender(){return actCost(G.carrinho?50:70,true,5);}
+
+// ── NPCs ─────────────────────────────────────────────────
+// align: 'bom'=generous(diplomacia +20%, intim -20%), 'neutro'=normal, 'mau'=stubborn(diplo -25%, intim +30%)
+// certinho: never accepts turbinada (amostra ou compra)
+const NPCS=[
+  // BONZINHOS
+  {e:'👩',nome:'Dona Zilda',t:'zilda',ctx:'Dona de casa simpática. Olha você com pena.',align:'bom',certinho:true},
+  {e:'👨‍🌾',nome:'Seu Zé',t:'ze',ctx:'Trabalhador rural na cidade. Coração generoso.',align:'bom',certinho:false},
+  {e:'👩‍🦳',nome:'Dona Maria',t:'maria',ctx:'Avó com sacola da feira. Sempre tem um trocado.',align:'bom',certinho:true},
+  {e:'👩‍🍳',nome:'Cozinheira',t:'coz',ctx:'Do restaurante próximo. Sai no intervalo.',align:'bom',certinho:false},
+  {e:'🧓',nome:'Seu Lúcio',t:'lucio',ctx:'Ex-comerciante aposentado. Respeita quem trabalha.',align:'bom',certinho:false},
+  {e:'👩',nome:'Professora Ana',t:'ana',ctx:'Professora de escola pública. Coração mole.',align:'bom',certinho:true},
+  {e:'🧕',nome:'Dona Fátima',t:'fatima',ctx:'Imigrante gentil. Não abandona ninguém.',align:'bom',certinho:true},
+  {e:'👴',nome:'Seu Benedito',t:'bene',ctx:'Aposentado com bengalão. Gosta de conversa.',align:'bom',certinho:true},
+  {e:'👩‍🦽',nome:'Dona Conceição',t:'conceicao',ctx:'Senhora de cadeira de rodas. Muito religiosa.',align:'bom',certinho:true},
+  {e:'🧑‍🌾',nome:'Tomás',t:'tomas',ctx:'Jovem trabalhador rural. Simpático e generoso.',align:'bom',certinho:false},
+  // NEUTROS
+  {e:'👨',nome:'Trabalhador',t:'trab',ctx:'Saiu do expediente. Cansado e com pressa.',align:'neutro',certinho:false},
+  {e:'🧑',nome:'Jovem',t:'jov',ctx:'Estudante com fone no ouvido. Sem paciência.',align:'neutro',certinho:false},
+  {e:'🕴',nome:'Vendedor Rivaldo',t:'rivaldo',ctx:'Vendedor ambulante. Conhece o jogo.',align:'neutro',certinho:false},
+  {e:'👨‍🦱',nome:'Caio',t:'caio',ctx:'Freelancer no celular. Distraído mas relaxado.',align:'neutro',certinho:false},
+  {e:'🧒',nome:'Larissa',t:'larissa',ctx:'Adolescente saindo da escola. Bolso apertado.',align:'neutro',certinho:false},
+  {e:'👷',nome:'Pedreiro Bruno',t:'bruno',ctx:'Saiu da obra com cimento nas mãos.',align:'neutro',certinho:false},
+  {e:'🧑‍🍳',nome:'Cozinheiro Rafael',t:'rafael',ctx:'Sous-chef num restaurante popular.',align:'neutro',certinho:false},
+  {e:'👩‍🎓',nome:'Estudante Bianca',t:'bianca',ctx:'Universitária com mochila enorme.',align:'neutro',certinho:false},
+  {e:'🧑‍💻',nome:'Dev Marcos',t:'marcos',ctx:'Desenvolvedor de app. Trabalha de home.',align:'neutro',certinho:false},
+  {e:'👨‍🚒',nome:'Bombeiro Renato',t:'renato',ctx:'Bombeiro de folga. Olha tudo com calma.',align:'neutro',certinho:false},
+  // MAUS
+  {e:'👩‍💼',nome:'Executiva',t:'exec',ctx:'Bem vestida, olha você com desconfiança.',align:'mau',certinho:true},
+  {e:'🧔',nome:'Alessandro',t:'ale',ctx:'Grandão, cara fechada. Já viu de tudo.',align:'mau',certinho:false},
+  {e:'👳',nome:'Seu Hassan',t:'hassan',ctx:'Dono de mercadinho. Olha as finanças com cuidado.',align:'mau',certinho:false},
+  {e:'👩‍🦰',nome:'Patrícia',t:'patricia',ctx:'Influenciadora digital. Faz cara de nojo.',align:'mau',certinho:false},
+  {e:'👨‍🦳',nome:'Geraldo',t:'geraldo',ctx:'Ex-segurança. Cara dura, não cede fácil.',align:'mau',certinho:false},
+  {e:'👨‍⚕️',nome:'Dr. Sérgio',t:'sergio',ctx:'Médico apressado. Não tem tempo pra você.',align:'mau',certinho:true},
+  {e:'🧑‍💼',nome:'Contador Firmino',t:'firmino',ctx:'Olha você como despesa desnecessária.',align:'mau',certinho:true},
+  {e:'👮‍♀️',nome:'Agente da ANVISA',t:'anvisa',ctx:'Inspeção de rotina. Olha pra você com suspeita.',align:'mau',certinho:true},
+  {e:'👨‍⚖️',nome:'Advogado Dantas',t:'dantas',ctx:'Advogado caro. Finge que você não existe.',align:'mau',certinho:true},
+  {e:'👩‍🏫',nome:'Diretora Sousa',t:'sousa',ctx:'Diretora de escola. Rígida e desconfiada.',align:'mau',certinho:true},
+];
+function randNPC(){
+  // Filtra NPCs que já apareceram hoje
+  const disponiveis=NPCS.filter(n=>!G.npcVistoHoje||!G.npcVistoHoje[n.t]);
+  const final=disponiveis.length>0?disponiveis:NPCS;
+  return final[Math.floor(Math.random()*final.length)];
+}
+function marcarNPCVisto(t){if(!G.npcVistoHoje)G.npcVistoHoje={};G.npcVistoHoje[t]=true;}
+// Bonus/malus por alinhamento
+function alignBonus(npc,tipo){
+  // tipo: 'diplo' ou 'intim'
+  if(!npc||!npc.align)return 0;
+  if(tipo==='diplo'){if(npc.align==='bom')return 20;if(npc.align==='mau')return -25;return 0;}
+  if(tipo==='intim'){if(npc.align==='mau')return 30;if(npc.align==='bom')return -20;return 0;}
+  return 0;
+}
+
+const F={
+  pedir_intro:{
+    trab:'...?',zilda:'Que foi, meu filho?',bene:'Pode falar, jovem.',jov:'Oi?',exec:'Sim?',
+    ze:'Opa, fala!',men:'Oi, o que é?',maria:'Sim, querido?',ale:'Fala.',coz:'Pode falar.',
+    lucio:'O que foi, rapaz?',ana:'Sim, pode falar.',rivaldo:'Irmão, fala aí.',caio:'Hmm?',
+    hassan:'O que quer?',patricia:'Sim?',fatima:'Pode falar, meu filho.',geraldo:'O que foi?',
+    larissa:'Oi?',sergio:'Rápido, que estou com pressa.',pol:'Para aí. Documentos.',
+  },
+  pedir_ok:{
+    trab:['Toma aqui.','Um trocado pra você.'],
+    zilda:['Que Deus te abençoe, toma.','Pobre coitado, toma filhinho.'],
+    bene:['Já passei por necessidade. Toma.'],
+    jov:['Tô com trocado, pega.','Ei, aqui.'],
+    exec:['Aqui, rápido.'],
+    ze:['Companheiro! Quando melhorar, me paga.'],
+    men:['É do meu lanche mas toma.'],
+    maria:['Vai com Deus, filho. Toma.'],
+    ale:['Toma. Não faço isso sempre.'],
+    coz:['Hoje foi bom dia, toma.'],
+    lucio:['Fui pobre também. Toma, rapaz.'],
+    ana:['Que situação difícil. Toma, vai.'],
+    rivaldo:['A gente se ajuda, irmão. Toma.'],
+    caio:['Ei, aqui. Vai lá.'],
+    hassan:['Toma, mas amanhã trabalha.'],
+    patricia:['Toma, não conta pra ninguém.'],
+    fatima:['Na minha terra a gente não abandona ninguém. Toma.'],
+    geraldo:['Olha, toma. Cuida-se.'],
+    larissa:['É pouco mas toma.'],
+    sergio:['Aqui, rápido. Cuida-se.'],
+  },
+  pedir_no:{
+    trab:['Não tenho trocado, desculpa.','Salário só na sexta.'],
+    zilda:['Hoje não tenho como, meu filho.'],
+    bene:['Aposentadoria tá curta. Desculpa.'],
+    jov:['Só tenho no Pix, desculpa.'],
+    exec:['Não. Procura o CRAS.'],
+    ze:['Tô apertado também esse mês.'],
+    men:['Não tenho dinheiro, desculpa.'],
+    maria:['Deixei a carteira em casa, perdão.'],
+    ale:['Hoje não dá, irmão.'],
+    coz:['Nem intervalo terminei ainda.'],
+    lucio:['Hoje não consigo, rapaz.'],
+    ana:['Desculpa, não carrego dinheiro físico.'],
+    rivaldo:['Irmão, se eu tivesse te dava.'],
+    caio:['Só no Pix, desculpa.'],
+    hassan:['Não, desculpa.'],
+    patricia:['Não mesmo. Procura ajuda.'],
+    fatima:['Hoje não tenho como, perdão.'],
+    geraldo:['Não posso agora. Segue em frente.'],
+    larissa:['Sou estudante, não tenho nada.'],
+    sergio:['Não tenho tempo nem trocado.'],
+  },
+  intim_intro:{
+    trab:'O que é isso?!',zilda:'Ai, pelo amor de Deus!',bene:'Para com esse absurdo!',
+    jov:'Cara, sério?!',exec:'Que situação ridícula!',ze:'Ih, vai com calma aí!',
+    men:'Eu to com medo!',maria:'Nossa Senhora me proteja!',ale:'Calma lá, irmão.',
+    coz:'O que foi isso?!',lucio:'Que isso rapaz, se acalma!',ana:'Por favor, não faça isso!',
+    rivaldo:'Irmão, relaxa, não precisa disso.',caio:'Ei, para!',hassan:'Cuidado com o que está fazendo!',
+    patricia:'Que situação horrível!',fatima:'Por favor, não faça isso!',geraldo:'Tá louco?',
+    larissa:'Eu vou gritar!',sergio:'Isso é absurdo!',pol:'Para imediatamente! Você está detido!',
+  },
+  intim_ok:{
+    trab:['Tá bom, para! Toma!'],zilda:['Aqui, toma tudo, pelo amor!'],bene:['Espera, espera! Aqui!'],
+    jov:['Mano, toma! Para!'],exec:['Toma e sai da minha frente!'],ze:['Uai, se é assim, toma.'],
+    men:['Toma! Não conta pra ninguém!'],maria:['Aqui está, pelo amor de Deus!'],ale:['Toma. Não volta por aqui.'],
+    coz:['Aqui, e some!'],lucio:['Toma, rapaz. Mas se arrepende.'],ana:['Aqui, para por favor!'],
+    rivaldo:['Toma, irmão. Que situação...'],caio:['Ei, toma, toma!'],hassan:['Aqui, mas nunca mais.'],
+    patricia:['Toma e vai embora!'],fatima:['Toma, que Deus te perdoe.'],geraldo:['Toma. Mas não cruza comigo de novo.'],
+    larissa:['Toma! Para!'],sergio:['Aqui, agora sai!'],
+  },
+  intim_no:{
+    trab:['Vou chamar a polícia!','Não anda não, vou gritar!'],zilda:['SOCORRO! ME AJUDEM!','Vou chamar todo mundo aqui!'],bene:['Não te dou nada! Para com isso, rapaz!','Já passei por coisa pior na vida. Vai embora.'],
+    jov:['Chamo a PM agora!','Vai embora antes que eu grite.'],exec:['Tenho câmera de segurança. Vai se arrepender.','Você vai ser identificado.'],ze:['Tenho gente aqui perto. Para logo.','Sou conhecido aqui. Para com isso.'],
+    men:['SOCORRO! ME AJUDA!','Vou gritar até alguém vir!'],maria:['Vou gritar até alguém chegar!','Que vergonha! Sua mãe sabe o que você faz?'],ale:['Errou o alvo. Vai enquanto pode.','Não sou a pessoa certa pra isso.'],
+    coz:['Trabalho aqui todo dia! Vou chamar o pessoal!','Safadeza, vou gritar!'],lucio:['Já vi pior. Vai embora logo.','Não intimido não. Pode ir.'],ana:['Vou registrar um boletim!','Não vou ceder. Pode chamar quem quiser.'],
+    rivaldo:['Tô filmando isso agora.','Companheiro não faz isso pra companheiro.'],caio:['Ligando pro 190 agora.','Para que isso cara, sério.'],hassan:['Conheço os policiais daqui. Vai embora.','Tenho câmera aqui. Para.'],
+    patricia:['Vou postar isso e você vai se arrepender.','Absurdo. Vou gritar.'],fatima:['Não tenho medo. Pode chamar quem quiser.','Vim de guerra, isso não me assusta.'],
+    geraldo:['Sou segurança há 20 anos. Certeza que quer isso?','Para agora antes que eu reaja.'],larissa:['SOCORRO! TEM ALGUÉM LOUCO AQUI!','Vou gritar muito alto!'],
+    sergio:['Conheço os plantonistas da delegacia.','Vai embora antes que isso fique sério.'],
+  },
+  venda_intro:{
+    trab:'Oi?',zilda:'O que você tem aí?',bene:'O que é isso?',jov:'Fala.',exec:'Sim?',
+    ze:'O que você vende?',men:'O que é isso?',maria:'Que cheirinho bom!',ale:'O que tem aí?',
+    coz:'Deixa eu ver.',lucio:'O que você tá vendendo?',ana:'O que é?',rivaldo:'Vendendo paçoca?',
+    caio:'Hmm, o que é?',hassan:'Pode mostrar.',patricia:'O que é isso?',fatima:'Que cheiro gostoso!',
+    geraldo:'O que tem aí?',larissa:'O que é?',sergio:'Rápido, fala.',
+  },
+  venda_ok:{
+    trab:['Me dá uma, tô com fome.'],zilda:['Adoro paçoca! Me dá duas!'],bene:['Saudade dos tempos de criança...'],
+    jov:['Por que não, me dá uma.'],exec:['Rápido, quanto é?'],ze:['Boa paçoca! Me dá.'],
+    men:['Quero! Me dá uma!'],maria:['Meus netos adoram! Vou levar.'],ale:['Pode ser. Me dá uma.'],
+    coz:['Me dá pra experimentar.'],lucio:['Parece boa. Me dá.'],ana:['Que saudade! Me dá uma.'],
+    rivaldo:['Solidário à causa. Me dá uma.'],caio:['Por que não. Me dá.'],hassan:['Deixa eu experimentar.'],
+    patricia:['Paçoca artesanal? Achei diferente.'],fatima:['Parece boa. Vou levar.'],
+    geraldo:['Tô com fome. Me dá.'],larissa:['Paçoca! Adoro! Me dá uma.'],sergio:['Rápido. Me dá uma.'],
+  },
+  venda_no:{
+    trab:['Não tô a fim agora.'],zilda:['Tenho em casa, obrigada.'],bene:['Dentista não deixa.'],
+    jov:['Tô de dieta.'],exec:['Não consumo esse tipo de produto.'],ze:['Já comprei hoje.'],
+    men:['Não tenho dinheiro.'],maria:['Comprei ontem ainda.'],ale:['Não hoje.'],
+    coz:['Faço melhor do que isso.'],lucio:['Hoje não, rapaz.'],ana:['Já comi, obrigada.'],
+    rivaldo:['Tô sem troco, irmão.'],caio:['Não tô a fim.'],hassan:['Muito açúcar, não.'],
+    patricia:['Não consume isso.'],fatima:['Hoje não, obrigada.'],geraldo:['Não, obrigado.'],
+    larissa:['Acabei o dinheiro do lanche.'],sergio:['Sem tempo.'],
+  },
+  roubo:{
+    msgs:['Passa a grana ou vai se arrepender!','Isso é um assalto! Colabora!','Me dá o dinheiro e as paçocas!','Não reage que é melhor!'],
+    fuga:['Correu feito um coelho!','Sumiu nas sombras.','Foi embora xingando baixinho.','Desapareceu na multidão.'],
+  },
+};
+// Extend F with new NPCs
+Object.assign(F.pedir_intro,{conceicao:'Que foi, querida?',tomas:'Oi, pode falar!',bruno:'Oi?',rafael:'Fala.',bianca:'Sim?',marcos:'Hmm?',renato:'Pode falar.',firmino:'Sim, o que quer?',anvisa:'O que é isso aqui?',dantas:'Rápido.',sousa:'Que foi?'});
+Object.assign(F.pedir_ok,{conceicao:['Deus abençoe, toma.'],tomas:['Aqui, companheiro.'],bruno:['Pega, camarada.'],rafael:['Toma, vai.'],bianca:['É pouco mas toma.'],marcos:['Aqui, vai.'],renato:['Toma, vai com fé.'],firmino:[],anvisa:[],dantas:[],sousa:[]});
+Object.assign(F.pedir_no,{conceicao:['Sem como ajudar hoje, perdão.'],tomas:['Tô sem trocado.'],bruno:['Sem grana, irmão.'],rafael:['Intervalo acabou.'],bianca:['Só tenho no Pix.'],marcos:['Só digital, desculpa.'],renato:['Não tenho agora.'],firmino:['Não.'],anvisa:['Não.'],dantas:['Não tenho tempo.'],sousa:['Não.']});
+Object.assign(F.intim_intro,{conceicao:'Pelo amor de Deus!',tomas:'Ei, calma!',bruno:'Que foi isso cara?!',rafael:'Para com isso!',bianca:'Que absurdo!',marcos:'Peraí!',renato:'Para. Agora.',firmino:'Você está cometendo um erro.',anvisa:'Isso é crime.',dantas:'Vou processar.',sousa:'Vai se arrepender.'});
+Object.assign(F.intim_ok,{conceicao:['Aqui, pelo amor!'],tomas:['Ei, toma!'],bruno:['Para! Toma!'],rafael:['Toma e some!'],bianca:['Aqui, sai!'],marcos:['Toma, para!'],renato:['Toma. Mas não erra de novo.'],firmino:['Toma e vai embora.'],anvisa:['...toma.'],dantas:['Aqui.'],sousa:['Toma.']});
+Object.assign(F.intim_no,{conceicao:['Vou chamar todo mundo!'],tomas:['Chamo quem tiver perto!'],bruno:['Tomou no lugar errado.'],rafael:['Vou gritar até virem!'],bianca:['Tô filmando tudo!'],marcos:['Ligando pro 190.'],renato:['Fui bombeiro 20 anos. Pode tentar.'],firmino:['Tenho advogado.'],anvisa:['Você tem ideia com quem fala?'],dantas:['Processo amanhã de manhã.'],sousa:['Câmera do colégio te pegou.']});
+Object.assign(F.venda_intro,{conceicao:'O que você tem aí?',tomas:'O que você vende?',bruno:'O que é?',rafael:'Fala.',bianca:'O que é isso?',marcos:'Hmm?',renato:'O que você tem?',firmino:'Não tenho interesse.',anvisa:'Que produto é esse?',dantas:'O que é isso?',sousa:'Sim?'});
+Object.assign(F.venda_ok,{conceicao:['Me dá, querida!'],tomas:['Me dá uma!'],bruno:['Me dá.'],rafael:['Pode ser.'],bianca:['Ai, paçoca! Me dá.'],marcos:['Por que não.'],renato:['Me dá uma.'],firmino:['Rápido.'],anvisa:['Hmm... deixa ver.'],dantas:['Me dá.'],sousa:['Me dá uma.']});
+Object.assign(F.venda_no,{conceicao:['Não posso, diabetes.'],tomas:['Já comi.'],bruno:['Não tô a fim.'],rafael:['Tenho em casa.'],bianca:['Muita caloria.'],marcos:['Não tô a fim.'],renato:['Não hoje.'],firmino:['Não tenho interesse.'],anvisa:['Preciso ver a vigilância sanitária desse produto.'],dantas:['Sem tempo.'],sousa:['Não.']});
+function pf(cat,t){
+  const a=F[cat]?.[t];
+  if(a===undefined)return '...';
+  if(Array.isArray(a))return a[Math.floor(Math.random()*a.length)];
+  return a;
+}
+
+const COACH_MSGS=[
+  '"O sucesso é uma escolha! Está escolhendo a pobreza?" 🚀',
+  '"Faturei R$80k em um mês com mindset!" 💰',
+  '"Acorde às 4h da manhã antes de reclamar!" ⏰',
+  '"Zona de conforto é armadilha do medíocre!" 🔥',
+  '"Em 30 dias transforma sua vida." 📈',
+  '"Os pobres trabalham, os ricos fazem o dinheiro trabalhar!" 💎',
+  '"Mentalidade milionária não é sonho, é disciplina!" 🧠',
+  '"O universo conspira a favor de quem age!" ✨',
+];
+
+const UPGRADES=[
+  {id:'caixa',nome:'Caixa de Paçoca',desc:'30 unidades. Vende a R$1,50 (desc. R$1,00).',preco:15,emoji:'🟫',cor:'g',unico:false,req:()=>true,acao:()=>{G.pacoca+=30;addLog('good','Comprou caixa! +30 paçocas.');}},
+  {id:'faca',nome:'Faquinha de Cozinha',desc:'+35% sucesso intimidar, +60% ganho. +10% risco prisão.',preco:10,emoji:'🔪',cor:'r',unico:true,req:()=>true,acao:()=>{addLog('warn','Faquinha comprada.');}},
+  {id:'comboa',nome:'Refeição Decente',desc:'+25 HP.',preco:25,emoji:'🍗',cor:'',unico:false,req:()=>true,acao:()=>{G.comida=true;G.hp=Math.min(G.hp+25,100);addLog('good','Comeu bem! +25 HP.');}},
+  // KITNET ALUGAR
+  {id:'kitnet_aluguel',nome:'Kitnet Sujo na Favela — Alugar',desc:'R$400/mês. Banho grátis.',preco:400,emoji:'🏠',cor:'y',unico:true,req:()=>!G.moradiaId,acao:()=>{G.moradiaId='kitnet';G.moradiaMode='aluguel';addLog('good','Alugou kitnet! Banho grátis.');}},
+  // KITNET FINANCIAR — bônus: +1 carisma base (ter endereço fixo te dá credibilidade)
+  {id:'kitnet_financiar',nome:'Kitnet Sujo na Favela — Financiar',desc:'Entrada R$10k. R$800/mês. Total R$100k.\nBônus: +1 Carisma base (endereço fixo = credibilidade).\nReq: Car+Apr≥8.',preco:10000,emoji:'🏠',cor:'p',unico:true,req:()=>!G.moradiaId&&(G.car+G.apr)>=8,reqMsg:'Car+Apr<8 ou já mora em algum lugar.',
+    acao:()=>{G.moradiaId='kitnet';G.moradiaMode='financiamento';G.financDivida=90000;G.financParcela=800;G.financMissed=0;
+      G.bcar+=1;G.car+=1; // endereço fixo = credibilidade no bairro
+      addLog('good','Financiou kitnet! Dívida R$90k. +1 Carisma base (agora tem endereço fixo).');}},
+  // APTO ALUGAR
+  {id:'apto_aluguel',nome:'Apto Claustrofóbico — Alugar',desc:'R$800/mês. Agilidade +2, descanso garantido.',preco:800,emoji:'🏡',cor:'y',unico:true,req:()=>G.moradiaId==='kitnet',reqMsg:'Precisa da kitnet primeiro.',acao:()=>{G.moradiaId='apto';G.moradiaMode='aluguel';G.bagi+=2;G.agi+=2;addLog('good','Alugou apto! +2 agi, descanso garantido.');}},
+  // APTO FINANCIAR — bônus: +2 carisma base + +1 aparência base (endereço de respeito)
+  {id:'apto_financiar',nome:'Apto Claustrofóbico — Financiar',desc:'Entrada R$20k. R$1600/mês. Total R$200k.\nBônus: +2 Carisma e +1 Aparência base (endereço que impressiona).\nReq: Car+Apr≥14.',preco:20000,emoji:'🏡',cor:'p',unico:true,req:()=>G.moradiaId==='kitnet'&&(G.car+G.apr)>=14,reqMsg:'Na kitnet e Car+Apr≥14.',
+    acao:()=>{G.moradiaId='apto';G.moradiaMode='financiamento';G.financDivida=180000;G.financParcela=1600;G.financMissed=0;
+      G.bagi+=2;G.agi+=2;G.bcar+=2;G.car+=2;G.bapr+=1;G.apr+=1;
+      addLog('good','Financiou apto! +2 agi, +2 Car base, +1 Apr base. Dívida R$180k.');}},
+  {id:'bicicleta',nome:'Bicicleta Usada',desc:'-20min em ações de rua.',preco:200,emoji:'🚲',cor:'',unico:true,req:()=>true,acao:()=>{G.bikBonus=20;addLog('good','Bicicleta! -20min em ações de rua.');}},
+  {id:'roupa',nome:'Roupa Nova',desc:'Aparência base +2.',preco:120,emoji:'👔',cor:'',unico:true,req:()=>true,acao:()=>{G.bapr+=2;G.apr=Math.min(G.apr+2,G.bapr);addLog('good','Roupa nova! +2 aparência base.');}},
+  {id:'sabonete',nome:'Vale — 1 semana na Pousada Wanderley',desc:'Banho grátis por 7 dias.',preco:30,emoji:'🧼',cor:'',unico:false,req:()=>true,acao:()=>{G.kitHig=(G.kitHig||0)+7;addLog('good','Vale Wanderley! 7 dias de banho grátis.');}},
+  {id:'carrinho',nome:'Carrinho de Vendas',desc:'+15% chance de vender, -10min.',preco:400,emoji:'🛒',cor:'',unico:true,req:()=>true,acao:()=>{G.carrinho=true;addLog('good','Carrinho comprado!');}},
+  // ── NOVAS FEATURES ─────────────────────────────────────
+  {id:'ponto_fixo',nome:'Ponto Fixo de Venda',desc:'Local movimentado. Gera 1-2 paçocas vendidas/hora passivamente.',preco:300,emoji:'📍',cor:'y',unico:true,req:()=>pacocaTotal()>0,reqMsg:'Precisa ter paçoca pra montar o ponto.',acao:()=>{G.pontoFixo=true;addLog('good','Ponto fixo montado! Vendas passivas de 1-2 paçocas/hora.');}},
+  {id:'licenca',nome:'Licença de Funcionamento — Prefeitura',desc:'Zera qualquer chance de confisco por guardas municipais permanentemente.',preco:100,emoji:'📋',cor:'',unico:true,req:()=>true,acao:()=>{G.licencaPrefeitura=true;addLog('good','Licença obtida! Guardas municipais não te incomodam mais.');}},
+  {id:'pacoca_caseira',nome:'Paçoca Caseira (receita própria)',desc:'Custo R$10 por lote, vende a R$2,00. Risco de confisco: 33% se guardas aparecerem. Se pego: multa R$50 + vigilância sanitária.',preco:10,emoji:'🥘',cor:'orange',unico:false,req:()=>true,acao:()=>{G.pacocaCaseira=(G.pacocaCaseira||0)+20;G.pacocaCaseiraAtiva=true;addLog('warn','Fez paçoca caseira! +20 paçocas (R$2,00 cada). Cuidado: risco de vigilância sanitária hoje.');}},
+  {id:'agiota',nome:'Pedir Empréstimo ao Agiota',desc:'R$50–200 agora. Pagar no último dia do mês — ou game over.',preco:0,emoji:'🤑',cor:'r',unico:false,req:()=>!G.agiotaEmprestado,reqMsg:'Já tem dívida com o agiota.',acao:()=>pedirAgiota()},
+  {id:'loteria',nome:'Bilhete de Loteria',desc:'R$5 por bilhete. 0,01% de ganhar R$5.000 no fim do dia. (sorteio gira 1000x por bilhete)',preco:5,emoji:'🎟',cor:'',unico:false,req:()=>true,acao:()=>{G.loteriaBilhetes++;G.gastosD+=5;G.gastosDetalhe.push({desc:'Bilhete de loteria',v:5});addLog('info','🎟 Bilhete comprado! Sorteio no fim do dia. Coach Finotti já está com inveja.');}},
+  {id:'curso_coach',nome:'Curso do Coach Finotti — "Milionário em 30 dias"',desc:'R$199. Promete multiplicar seu potencial. Aumenta carisma +1 por 3 dias (depois some).',preco:199,emoji:'🎓',cor:'p',unico:false,req:()=>true,acao:()=>{G.courseBonus=1;G.courseDaysLeft=3;G.bcar+=1;G.car+=1;addLog('warn','🎓 Curso comprado! +1 Carisma por 3 dias. Conteúdo: Acorde cedo. Trabalhe duro. Repita. — Coach Finotti');}},
+  {id:'masterclass',nome:'Masterclass Coach Finotti — "O Segredo do Milhão"',desc:'R$500. Oferta especial semanal. Contém: 3 páginas de PDF. Revelará o segredo definitivo do sucesso.',preco:500,emoji:'🎙',cor:'p',unico:false,req:()=>G.masterclassOferta,reqMsg:'Nenhuma oferta disponível no momento.',acao:()=>{G.masterclassComprada=true;G.masterclassOferta=false;addLog('warn','🎙 Masterclass comprada! O PDF chegará amanhã...');}},
+  {id:'crack',nome:'"Cocada Boa"',desc:'"isso é só cocada, eu juro, seu policial". 10% chance de prisão ao comprar.',preco:80,emoji:'⚪',cor:'r',unico:false,req:()=>true,acao:()=>{
+    if(Math.random()<0.10){G.pacocaNormal=0;G.pacocaTurbinada=0;processarPrisao(1000,'venda de entorpecentes',false);G.tornozeleira=true;G.tornozeleiraDivida=Math.max(G.tornozeleiraDivida||0,Math.abs(Math.min(G.money,0)));}
+    else{G.pacocaTurbinada=(G.pacocaTurbinada||0)+30;addLog('warn','"Cocada boa" estocada. Vai vendendo...');}
+  }},
+];
+
+let G={};
+// ── SAVE / LOAD ───────────────────────────────────────────
+const SAVE_KEY='pacoca_sim_v1';
+
+function saveGame(){
+  if(!G||G.day===undefined)return;
+  // Don't save runtime-only fields
+  const toSave={...G};
+  toSave.briefNPC=null; // non-serialisable, reset on load
+  toSave._savedAt=Date.now();
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify(toSave));}catch(e){}
+}
+
+function deleteSave(){
+  try{localStorage.removeItem(SAVE_KEY);}catch(e){}
+}
+
+function hasSave(){
+  try{const s=localStorage.getItem(SAVE_KEY);return !!s;}catch(e){return false;}
+}
+
+function getSaveInfo(){
+  try{
+    const s=localStorage.getItem(SAVE_KEY);
+    if(!s)return null;
+    const d=JSON.parse(s);
+    return {day:d.day,money:d.money,hp:d.hp,savedAt:d._savedAt};
+  }catch(e){return null;}
+}
+
+function carregarJogo(){
+  try{
+    const s=localStorage.getItem(SAVE_KEY);
+    if(!s){alert('Sem save encontrado.');return;}
+    const d=JSON.parse(s);
+    // Integrity check — must have the core fields
+    if(typeof d.day!=='number'||typeof d.money!=='number'||typeof d.hp!=='number'){
+      deleteSave();alert('Save corrompido. Começando novo jogo.');goTo('s-create');return;
+    }
+    G={...d};
+    G.briefNPC=null;
+    G.muted=false;
+    // ── Migração de saves antigos ────────────────────
+    // Versões antigas usavam G.pacoca em vez dos 3 campos separados
+    if(typeof G.pacoca==='number'&&typeof G.pacocaNormal!=='number'){
+      G.pacocaNormal=G.pacoca;
+      delete G.pacoca;
+    }
+    if(typeof G.pacocaNormal!=='number')G.pacocaNormal=0;
+    if(typeof G.pacocaCaseira!=='number')G.pacocaCaseira=0;
+    if(typeof G.pacocaTurbinada!=='number')G.pacocaTurbinada=0;
+    if(!G.clientesFieis)G.clientesFieis={};
+    if(!G.dependentes)G.dependentes={};
+    if(!G.npcVistoHoje)G.npcVistoHoje={};
+    G.briefTipoVenda=null; // sempre limpa ao carregar
+    G.briefingAtivo=false;
+    // Ensure arrays/objects exist
+    if(!G.log)G.log=[];
+    if(!G.upgrades)G.upgrades={};
+    if(!G.pts)G.pts={car:G.bcar||0,apr:G.bapr||0,agi:G.bagi||0};
+    if(!G.gastosDetalhe)G.gastosDetalhe=[];
+    addLog('info','Jogo carregado. Dia '+G.day+'. Saldo: R$'+fmt(G.money)+'.');
+    updateTitleSaveInfo();
+    startMusic();goTo('s-game');updateUI();renderLoja();
+  }catch(e){
+    deleteSave();alert('Erro ao carregar save. Começando novo jogo.');goTo('s-create');
+  }
+}
+
+function updateTitleSaveInfo(){
+  const el=document.getElementById('title-continue');
+  const info=document.getElementById('title-save-info');
+  if(!el)return;
+  const sv=getSaveInfo();
+  if(sv){
+    el.style.display='block';
+    const d=new Date(sv.savedAt);
+    const ts=d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    info.textContent='Dia '+sv.day+' · R$'+sv.money.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' · HP '+sv.hp+'/100 · '+ts;
+  }else{
+    el.style.display='none';
+  }
+}
+
+function initG(){
+  const sd=Math.floor(Math.random()*27)+1;
+  G={day:1,calDay:sd,calMonth:1,mins:DAY_START,
+    money:0,pacoca:0,hp:100,
+    car:0,apr:0,agi:0,bcar:0,bapr:0,bagi:0,
+    comida:false,banho:false,descanso:false,
+    dsCom:0,dsBan:0,dsDes:0,
+    moradiaId:null,moradiaMode:null,
+    financDivida:0,financParcela:0,financMissed:0,
+    alqDias:sd,vendidos:0,ganhosD:0,gastosD:0,gastosDetalhe:[],imundo:false,
+    aguardaEnt:false,entFeita:false,log:[],
+    pts:{car:0,apr:0,agi:0},upgrades:{},
+    kitHig:0,bikBonus:0,carrinho:false,
+    intimidCount:0,intimidouHoje:false,muted:false,
+    tornozeleira:false,tornozeleiraDivida:0,
+    lastActUsed:false,forcedExhausted:false,timedState:null,agiDebuff:0,
+    _eventoConcorrente:false,_eventoLoteria:null,_eventoAgiota:false,
+    briefingAtivo:false,briefNPC:null,
+    // events
+    chuva:false,promocaoRestaurante:false,chuvaAvisada:false,
+    // npcs dinamicos
+    clientesFieis:{}, // t→contagem de vendas
+    concorrenteAtivo:false,concorrenteSumiu:false,
+    agiotaDivida:0,agiotaEmprestado:false,
+    // features
+    pontoFixo:false,licencaPrefeitura:false,
+    pacocaCaseiraAtiva:false,
+    vendaGanhoTotal:0, // total de dinheiro ganho vendendo (para LinkedIn)
+    courseBonus:0,courseDaysLeft:0,
+    loteriaBilhetes:0,
+    masterclassOferta:false,masterclassComprada:false,
+    linkedinTier:0,
+    // paçocas separadas
+    pacocaNormal:0,    // paçoca comum
+    pacocaCaseira:0,   // paçoca caseira (R$2,00)
+    pacocaTurbinada:0, // paçoca adulterada
+    // dependentes de turbinada: t→true
+    dependentes:{},
+    cocadaSuborno:null, // {mes:N} se subornou este mês — sem abordagem; expira quando vira o mês
+    // npcs vistos hoje
+    npcVistoHoje:{},
+  };
+}
+
+function novoJogo(){
+  // Reseta o estado completo do jogo antes de ir pra tela de criação
+  // (importante quando o jogador clica em NOVO JOGO depois de ter carregado um save)
+  initG();
+  // Limpa a UI da tela de criação
+  const ids=['vc','va','ag'];ids.forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='0';});
+  const pt=document.getElementById('pts');if(pt)pt.textContent='12';
+  const bs=document.getElementById('btn-st');if(bs)bs.disabled=true;
+  goTo('s-create');
+}
+
+function resetGame(){
+  stopMusic();deleteSave();initG();
+  // Reset create-character screen so pts UI is clean
+  const ids=['vc','va','ag'];ids.forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='0';});
+  const pt=document.getElementById('pts');if(pt)pt.textContent='12';
+  const bs=document.getElementById('btn-st');if(bs)bs.disabled=true;
+  updateTitleSaveInfo();goTo('s-title');
+}
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.classList.remove('flash-red');});
+  const el=document.getElementById(id);if(el)el.classList.add('active');
+  closeModal();fecharEnt();
+  if(id==='s-title')updateTitleSaveInfo();
+}
+function adj(stat,d){
+  const cur=G.pts[stat];if(cur+d<0)return;
+  if(d>0&&(G.pts.car+G.pts.apr+G.pts.agi)>=12)return;
+  if(d>0&&G.pts[stat]>=10)return;
+  G.pts[stat]+=d;const left=12-(G.pts.car+G.pts.apr+G.pts.agi);
+  document.getElementById('pts').textContent=left;
+  document.getElementById('vc').textContent=G.pts.car;
+  document.getElementById('va').textContent=G.pts.apr;
+  document.getElementById('ag').textContent=G.pts.agi;
+  document.getElementById('btn-st').disabled=left>0;
+}
+function startGame(){
+  G.car=G.pts.car;G.apr=G.pts.apr;G.agi=G.pts.agi;
+  G.bcar=G.pts.car;G.bapr=G.pts.apr;G.bagi=G.pts.agi;
+  addLog('info','Dia 1. Barraca furada. R$0. São 8 da manhã.');
+  addLog('warn','Rádio: "HOJE É O DIA DA VIRADA!" — Coach Finotti');
+  saveGame();
+  startMusic();goTo('s-game');updateUI();
+}
+function addLog(t,m){G.log.unshift({t,m});if(G.log.length>80)G.log.pop();renderLog();}
+function renderLog(){const b=document.getElementById('logbox');if(!b)return;b.innerHTML=G.log.slice(0,30).map(e=>`<div class="le ${e.t}">${e.m}</div>`).join('');}
+function fmt(n){return n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function pacocaTotal(){return (G.pacocaNormal||0)+(G.pacocaCaseira||0)+(G.pacocaTurbinada||0);}
+// Intimidação: base 1%, +1.2% por tentativa (bem leve), faca +7%
+function intimidRisk(){return Math.min(1+G.intimidCount*1.2+(G.upgrades.faca?7:0)+(G.tornozeleira?5:0)+G.dsDes*1.0,85);}
+function moradiaTemBanho(){return G.moradiaId==='kitnet'||G.moradiaId==='apto';}
+function moradiaTemDescanso(){return G.moradiaId==='apto';}
+function nomeMoradia(){if(!G.moradiaId)return 'Barraca furada de sem-teto';if(G.moradiaId==='kitnet')return 'Kitnet Sujo na Favela';return 'Apto Claustrofóbico';}
+
+function isAfterMidnight(){return G.mins>=DAY_END;}
+
+// canStillAct:
+// - Before midnight → always true
+// - After midnight, timedState='tired' (crossed) → still one action allowed (lastActUsed tracks it)
+// - After midnight, lastActUsed=true → only sleep
+function canStillAct(){
+  if(!isAfterMidnight())return true;
+  if(!G.lastActUsed)return true;   // one extra action still available after midnight
+  return false;
+}
+
+// checkAfterAction: called after EVERY action, ONLY marks exhausted if action STARTED after midnight
+// We pass startedAfterMidnight as a parameter to avoid ambiguity
+function checkAfterAction(startedAfterMidnight){
+  if(startedAfterMidnight&&!G.lastActUsed){
+    // Action started AND ended after midnight → exhausted, lock further actions
+    G.lastActUsed=true;
+    G.timedState='exhausted';
+    addLog('bad','😵 EXAUSTO — agiu após a meia-noite. Só resta dormir!');
+    updateUI();
+  }
+  // If started BEFORE midnight but crossed → spendMins already set timedState='tired'
+  // and lastActUsed is NOT set → player still has one more action available
+}
+
+function spendMins(m){
+  const wasBeforeMidnight=G.mins<DAY_END;
+  G.mins+=m;
+  if(G.mins>DAY_END+480)G.mins=DAY_END+480;
+  // Started before, ended after → TIRED only, still one action left
+  if(wasBeforeMidnight&&G.mins>=DAY_END&&G.timedState!=='exhausted'){
+    if(G.timedState!=='tired'){  // don't overwrite if already set
+      G.timedState='tired';
+      addLog('warn','⚠ A ação cruzou a meia-noite — CANSADO amanhã (-1 agi). Ainda há uma ação disponível.');
+    }
+  }
+}
+
+// ── BRIEFING ──────────────────────────────────────────────
+function showBriefIdle(){
+  G.briefingAtivo=false;
+  document.getElementById('brief-idle').style.display='flex';
+  document.getElementById('brief-active').style.display='none';
+  document.getElementById('brief-result').style.display='none';
+}
+function showBriefActive(npc,speech,optsHtml){
+  G.briefingAtivo=true;
+  document.getElementById('brief-idle').style.display='none';
+  document.getElementById('brief-active').style.display='block';
+  document.getElementById('brief-result').style.display='none';
+  document.getElementById('br-av').textContent=npc.e;
+  document.getElementById('br-av').style.borderColor=npc.isPol?'var(--red)':'var(--border2)';
+  const badge=document.getElementById('br-badge');
+  badge.textContent=npc.isPol?'👮 POLICIAL':'';
+  badge.style.color='var(--red)';
+  document.getElementById('br-name').textContent=npc.nome;
+  document.getElementById('br-ctx').textContent=npc.ctx;
+  document.getElementById('br-speech').textContent=speech;
+  document.getElementById('br-opts').innerHTML=optsHtml;
+}
+function showBriefResult(npc,speech,resultHtml,timeTxt,ok){
+  G.briefingAtivo=false; // result shown — unlock buttons
+  document.getElementById('brief-idle').style.display='none';
+  document.getElementById('brief-active').style.display='none';
+  document.getElementById('brief-result').style.display='block';
+  document.getElementById('br2-av').textContent=npc.e;
+  document.getElementById('br2-av').style.borderColor=ok?'var(--green)':'var(--red)';
+  document.getElementById('br2-name').textContent=npc.nome;
+  document.getElementById('br2-speech').textContent=speech;
+  document.getElementById('br2-result').innerHTML=resultHtml;
+  document.getElementById('br2-time').textContent=timeTxt;
+}
+
+function iniciarBriefing(tipo,subtipo){
+  if(G.briefingAtivo){return;} // already in a briefing — ignore
+  if(!canStillAct()){addLog('bad','Sem mais ações por hoje. Durma!');return;}
+  if(tipo==='pedir'){
+    const cost=actCost(90,true);
+    const npc=randNPC(false);
+    G.briefNPC=npc;
+    const risk=Math.round(intimidRisk());
+    showBriefActive(npc,pf('pedir_intro',npc.t),
+      `<button onclick="executarPedir('diplo')" style="width:100%;margin:3px 0;font-size:12px">🤝 Diplomacia (${cost}min)</button>`+
+      `<button class="orange" onclick="executarPedir('intim')" style="width:100%;margin:3px 0;font-size:12px">😤 Intimidação${G.upgrades.faca?' 🔪':''} (${cost}min) — Prisão: ~${risk}%</button>`+
+      `<button onclick="cancelarBriefing()" style="width:100%;margin-top:4px;font-size:11px">← Cancelar</button>`
+    );
+  } else if(tipo==='vender'){
+    const tipoVenda=subtipo||'normal'; // 'normal' | 'caseira' | 'turbinada'
+    const stqty=tipoVenda==='caseira'?(G.pacocaCaseira||0):tipoVenda==='turbinada'?(G.pacocaTurbinada||0):(G.pacocaNormal||0);
+    if(stqty<=0){addLog('bad','Sem paçoca '+tipoVenda+'!');return;}
+
+    // ── CONFISCO: guardas municipais aparecem antes da venda ──
+    // 0.5% chance em paçoca normal/turbinada · 20% em caseira · 0% com licença
+    if(!G.licencaPrefeitura&&tipoVenda!=='turbinada'){
+      const chanceConfisco=tipoVenda==='caseira'?0.20:0.005;
+      if(Math.random()<chanceConfisco){
+        const guardas={e:'👮‍♂️',nome:'Guarda Municipal',ctx:'Fiscalização em ronda. Te abordou de cara fechada.',align:'mau',certinho:true};
+        G.briefNPC=guardas;G.briefingAtivo=true;
+        const motivo=tipoVenda==='caseira'?
+          '"Comercialização de alimentos artesanais sem alvará da prefeitura E sem certificação da vigilância sanitária! Tô apreendendo tudo."':
+          '"Trabalhando sem alvará pra comercialização de produtos? Tô apreendendo tudo agora."';
+        const multa=tipoVenda==='caseira'?50:0;
+        showBriefActive(guardas,motivo,
+          `<button class="r" onclick="confiscarPacocas('${tipoVenda}',${multa})" style="width:100%;margin:3px 0;font-size:12px">😞 Aceitar o confisco${multa>0?' + multa R$'+multa:''}</button>`+
+          `<button class="orange" onclick="reagirConfisco('${tipoVenda}',${multa})" style="width:100%;margin:3px 0;font-size:12px">✊ Reagir (50% perde tudo+multa+50HP, 30% perde paçocas, 20% safe)</button>`+
+          `<button class="y" onclick="correrConfisco('${tipoVenda}',${multa})" style="width:100%;margin:3px 0;font-size:12px">🏃 Correr (70% safe sem paçocas, 30% pega tudo+20HP)</button>`+
+          `<div style="font-size:10px;color:var(--text3);text-align:center;margin-top:6px">💡 Licença de Funcionamento (R$100) elimina essa chance.</div>`
+        );
+        return;
+      }
+    }
+    // ── POLÍCIA: abordagem ao vender "cocada boa" ──
+    // 10% normal · 50% se o mês virou e tem suborno pendente · 0% se já subornou este mês
+    if(tipoVenda==='turbinada'){
+      // Se já subornou este mês: chance zerada
+      let chancePolicia=0.10;
+      let policialMesNovo=false;
+      if(G.cocadaSuborno){
+        if(G.cocadaSuborno.mes===G.calMonth){
+          chancePolicia=0; // já pagou esse mês — livre
+        }else{
+          // Mês virou — policial volta cobrando, chance sobe pra 50%
+          chancePolicia=0.50;
+          policialMesNovo=true;
+        }
+      }
+      if(Math.random()<chancePolicia){
+        const policial={e:'👮',nome:'Policial',ctx:'Veio em cima de você. Cheirou de longe.',align:'mau',certinho:true};
+        G.briefNPC=policial;G.briefingAtivo=true;
+        const fala=policialMesNovo?
+          '"E aí, esperto! O mês virou. Hora de você manter nossa parceria viva, ou eu te levo agora."':
+          '"Achei! Venda de entorpecentes! Tô te levando!"';
+        let opts='<button class="r" onclick="aceitarPrisaoCocada()" style="width:100%;margin:3px 0;font-size:12px">😞 Se entregar — R$1000 multa + tornozeleira</button>'+
+                 '<button class="orange" onclick="resistirPrisaoCocada()" style="width:100%;margin:3px 0;font-size:12px">⚡ Resistir à prisão</button>';
+        if(G.money>=100){
+          opts+='<button class="y" onclick="subornarPolicial()" style="width:100%;margin:3px 0;font-size:12px">💵 Subornar (R$100 — 70% sucesso)</button>';
+        }
+        showBriefActive(policial,fala,opts);
+        return;
+      }
+    }
+    const cost=actCostVender();
+    const npc=randNPC(false);
+    G.briefNPC=npc;G.briefTipoVenda=tipoVenda;
+    const basePreco=tipoVenda==='caseira'?2.0:tipoVenda==='turbinada'?35.0:1.5;
+    const precoDesc=tipoVenda==='caseira'?1.5:tipoVenda==='turbinada'?30.0:1.0;
+    const autoSell=tipoVenda==='normal'&&G.apr>=6&&!G.imundo&&Math.random()*10<G.apr*(G.carrinho?1.5:1);
+    const isFidel=G.clientesFieis[npc.t]>=3&&!G.imundo&&tipoVenda==='normal';
+    const temLote=tipoVenda==='normal'&&stqty>=5;
+    // Turbinada: check se é dependente ou oferecer amostra
+    const isDependente=tipoVenda==='turbinada'&&G.dependentes[npc.t];
+    const podeAmostra=tipoVenda==='turbinada'&&!G.dependentes[npc.t]&&!npc.certinho;
+    const labelNome=tipoVenda==='caseira'?'Paçoca Caseira':tipoVenda==='turbinada'?'"Cocada Boa"':'Paçoca';
+    showBriefActive(npc,pf('venda_intro',npc.t),
+      `<div style="font-size:10px;color:var(--text3);margin-bottom:4px">${cost}min · ${labelNome} · R$${basePreco.toFixed(2)}${G.chuva?' ☔+30min':''}</div>`+
+      (isDependente?
+        `<button class="r" onclick="executarVendaTurb(true)" style="width:100%;margin:3px 0;font-size:12px">⚪ Vender pra dependente (R$50!)</button>`:
+      podeAmostra?
+        `<button class="orange" onclick="executarVendaTurb(false)" style="width:100%;margin:3px 0;font-size:12px">🆓 Oferecer amostra grátis (vicia!)</button>`+
+        `<button onclick="executarVenda(0,35.0,false)" style="width:100%;margin:3px 0;font-size:12px">Tentar vender R$35,00 (sem amostra)</button>`:
+      tipoVenda==='turbinada'&&npc.certinho?
+        `<div style="color:var(--red);font-size:12px;padding:6px">❌ Este NPC nunca vai tocar nisso.</div>`:
+      isFidel?
+        `<button class="g" onclick="executarVenda(0,${basePreco},true)" style="width:100%;margin:3px 0;font-size:12px">⭐ Cliente fiel — compra automática!</button>`:
+      autoSell?
+        `<button class="g" onclick="executarVenda(0,${basePreco},true)" style="width:100%;margin:3px 0;font-size:12px">✨ Venda automática!</button>`:
+        `<button onclick="executarVenda(0,${basePreco},false)" style="width:100%;margin:3px 0;font-size:12px">Oferecer: R$${basePreco.toFixed(2)}</button>`+
+        `<button onclick="executarVenda(10,${precoDesc},false)" style="width:100%;margin:3px 0;font-size:12px">Desconto: R$${precoDesc.toFixed(2)}</button>`+
+        (temLote?`<button class="y" onclick="executarVendaLote()" style="width:100%;margin:3px 0;font-size:12px">🎁 Lote de 5 (R$5,00)</button>`:'')+
+        `<button onclick="executarVenda(${G.car*2},${basePreco},false)" style="width:100%;margin:3px 0;font-size:12px">Contar historinha triste</button>`
+      )+
+      `<button onclick="cancelarBriefing()" style="width:100%;margin-top:4px;font-size:11px;color:var(--red)">← Desistir</button>`
+    );
+  }
+}
+function aceitarPrisaoCocada(){
+  cancelarBriefing();
+  G.pacocaTurbinada=0;
+  processarPrisao(1000,'venda de entorpecentes',false);
+  G.tornozeleira=true;
+  G.tornozeleiraDivida=Math.max(G.tornozeleiraDivida||0,Math.abs(Math.min(G.money,0)));
+  addLog('bad','💀 R$1000 multa + tornozeleira eletrônica ativada.');
+}
+
+function resistirPrisaoCocada(){
+  cancelarBriefing();
+  sfx('tiro');
+  setTimeout(()=>{
+    document.getElementById('resist-saldo').textContent=fmt(G.money);
+    deleteSave();
+    goTo('s-over-resist');
+  },500);
+}
+
+function subornarPolicial(){
+  if(G.money<100){addLog('bad','Sem R$100 pra suborno!');return;}
+  if(Math.random()<0.70){
+    // Sucesso — paga R$100, livre até o mês virar
+    G.money-=100;G.gastosD+=100;G.gastosDetalhe.push({desc:'Suborno policial 💵',v:100});
+    G.cocadaSuborno={mes:G.calMonth};
+    sfx('coin');
+    addLog('good','💵 Suborno aceito! Policial sumiu. Sem abordagem até o mês virar.');
+    showBriefResult(G.briefNPC,'"Beleza, tamo junto. Até o mês que vem."','<span style="color:var(--green)">Suborno aceito — R$100</span>','',true);
+    G.briefNPC=null;G.briefTipoVenda=null;
+  }else{
+    // Falhou — policial leva mesmo (e ainda gasta o R$100 que tentou oferecer)
+    G.money-=100;G.gastosD+=100;G.gastosDetalhe.push({desc:'Suborno recusado',v:100});
+    addLog('bad','🚨 Suborno recusado! "Cê tá me oferecendo PROPINA?! Agora foi de vez."');
+    showBriefResult(G.briefNPC,'"Cê tá oferecendo PROPINA pra um policial?! Agora foi!"','<span style="color:var(--red)">Suborno recusado!</span>','',false);
+    setTimeout(()=>{
+      G.pacocaTurbinada=0;
+      processarPrisao(1000,'venda de entorpecentes + tentativa de suborno',false);
+      G.tornozeleira=true;
+      G.tornozeleiraDivida=Math.max(G.tornozeleiraDivida||0,Math.abs(Math.min(G.money,0)));
+    },800);
+  }
+}
+
+function reagirConfisco(tipoVenda,multa){
+  const npc=G.briefNPC;
+  const r=Math.random();
+  const qtyField=tipoVenda==='caseira'?'pacocaCaseira':'pacocaNormal';
+  const qtd=G[qtyField]||0;
+  let speech, result, ok;
+  if(r<0.50){
+    // Falha total — leva paçocas, multa e -50 HP
+    G[qtyField]=0;G.hp=Math.max(G.hp-50,0);
+    if(multa>0){G.money-=multa;G.gastosD+=multa;G.gastosDetalhe.push({desc:'Multa vigilância sanitária',v:multa});}
+    sfx('fail');
+    speech='"Achou que ia conseguir o quê?! Toma!"';
+    result=`<span style="color:var(--red)">💥 -50 HP · -${qtd} paçocas${multa>0?' · -R$'+multa+' multa':''}</span>`;
+    ok=false;
+    addLog('bad','💥 Reação falhou! -50 HP, perdeu '+qtd+' paçocas'+(multa>0?' + multa R$'+multa:'')+'.');
+  }else if(r<0.80){
+    // Sucesso parcial — perde paçocas mas sem multa
+    G[qtyField]=0;
+    sfx('fail');
+    speech='"Volta aqui, moleque!"';
+    result=`<span style="color:var(--orange)">😬 Fugiu, mas as ${qtd} paçocas ficaram pra trás</span>`;
+    ok=true;
+    addLog('warn','😬 Fugiu sem apanhar, mas perdeu '+qtd+' paçocas.');
+  }else{
+    // Sucesso total — mantém tudo
+    sfx('coin');
+    speech='"Maldito! Voltou comigo dessa vez!"';
+    result=`<span style="color:var(--green)">💪 Salvou as ${qtd} paçocas e escapou ileso</span>`;
+    ok=true;
+    addLog('good','💪 Reação bem sucedida! Salvou as '+qtd+' paçocas e escapou ileso.');
+  }
+  showBriefResult(npc,speech,result,'',ok);
+  G.briefNPC=null;G.briefTipoVenda=null;
+  updateUI();
+  if(G.hp<=0)setTimeout(()=>gameOver('Espancado pelos guardas municipais.\nSaldo: R$'+fmt(G.money)),600);
+}
+
+function correrConfisco(tipoVenda,multa){
+  const npc=G.briefNPC;
+  const r=Math.random();
+  const qtyField=tipoVenda==='caseira'?'pacocaCaseira':'pacocaNormal';
+  const qtd=G[qtyField]||0;
+  let speech,result,ok;
+  if(r<0.70){
+    // Sucesso — escapou mas deixou as paçocas
+    G[qtyField]=0;
+    sfx('coin');
+    speech='"Volta aqui! Esse é seu material!"';
+    result=`<span style="color:var(--orange)">🏃 Escapou — perdeu ${qtd} paçocas</span>`;
+    ok=true;
+    addLog('warn','🏃 Conseguiu correr e escapar! Perdeu '+qtd+' paçocas.');
+  }else{
+    // Falha — pega tudo, multa e -20 HP
+    G[qtyField]=0;G.hp=Math.max(G.hp-20,0);
+    if(multa>0){G.money-=multa;G.gastosD+=multa;G.gastosDetalhe.push({desc:'Multa vigilância sanitária',v:multa});}
+    sfx('fail');
+    speech='"Não corre não, amigo. Vem cá!"';
+    result=`<span style="color:var(--red)">💥 -20 HP · -${qtd} paçocas${multa>0?' · -R$'+multa+' multa':''}</span>`;
+    ok=false;
+    addLog('bad','💥 Pegaram você! -20 HP, perdeu '+qtd+' paçocas'+(multa>0?' + multa R$'+multa:'')+'.');
+  }
+  showBriefResult(npc,speech,result,'',ok);
+  G.briefNPC=null;G.briefTipoVenda=null;
+  updateUI();
+  if(G.hp<=0)setTimeout(()=>gameOver('Caiu correndo dos guardas municipais.\nSaldo: R$'+fmt(G.money)),600);
+}
+
+function confiscarPacocas(tipoVenda,multa){
+  const npc=G.briefNPC;
+  let qtd;
+  if(tipoVenda==='caseira'){
+    qtd=G.pacocaCaseira||0;
+    G.pacocaCaseira=0;
+    if(multa>0){
+      G.money-=multa;G.gastosD+=multa;
+      G.gastosDetalhe.push({desc:'Multa vigilância sanitária',v:multa});
+    }
+    addLog('bad','👮‍♂️ Guardas confiscaram '+qtd+' paçocas caseiras + multa R$'+multa+'.');
+  }else{
+    qtd=G.pacocaNormal||0;
+    G.pacocaNormal=0;
+    addLog('bad','👮‍♂️ Guardas confiscaram '+qtd+' paçocas (sem alvará).');
+  }
+  sfx('fail');
+  showBriefResult(npc,'"Bom rapaz. Da próxima vez tira o alvará na prefeitura."',
+    `<span style="color:var(--red)">📦 -${qtd} paçocas${multa>0?' · -R$'+multa+' multa':''}</span>`,'',false);
+  G.briefNPC=null;G.briefTipoVenda=null;
+  updateUI();
+}
+
+function cancelarBriefing(){G.briefNPC=null;G.briefTipoVenda=null;G.briefingAtivo=false;showBriefIdle();updateUI();}
+function executarPedir(modo){
+  const npc=G.briefNPC||randNPC(false);
+  if(modo==='intim'){
+    doIntimidar(npc);
+  } else doPedir(npc);
+}
+function executarVenda(bonus,preco,auto){
+  doVender(G.briefNPC||randNPC(false),bonus,preco,auto);
+}
+
+// ── ACTIONS ───────────────────────────────────────────────
+function doAct(t){
+  if(t==='dormir'){doDormir();return;}
+  if(!canStillAct()){addLog('bad','Sem mais ações por hoje. Durma!');return;}
+  if(t==='caixa')doCaixa();
+  else if(t==='comer')doComer();
+  else if(t==='banho')doBanho();
+  else if(t==='comer_pacoca')doComerPacoca();
+}
+
+function doPedir(npc){
+  const cost=actCostPedir();const _sam=isAfterMidnight();spendMins(cost);
+  if(G.lastActUsed&&G.mins>=DAY_END)return;
+
+  // Aparência < 3: chance crescente de a pessoa ignorar/evitar antes de ouvir
+  if(G.apr<3){
+    const ignoreCh=Math.max((3-G.apr)*15,0); // apr=2→15%, apr=1→30%, apr=0→45%, apr=-1→60%
+    if(Math.random()*100<ignoreCh){
+      sfx('fail');
+      const fugas=['Desviou o olhar e acelerou o passo.','Nem olhou pra você.','Fingiu que estava no celular.','Cruzou a rua antes de você chegar perto.'];
+      const fuga=fugas[Math.floor(Math.random()*fugas.length)];
+      showBriefResult(npc,fuga,'<span style="color:var(--red)">Ignorado — aparência muito baixa</span>','⏱ +'+cost+'min',false);
+      addLog('bad',npc.e+' '+npc.nome+': '+fuga+' (aparência '+G.apr+')');
+      G.briefNPC=null;updateUI();
+      if(G.mins>=DAY_END)checkAfterAction(_sam);
+      return;
+    }
+  }
+
+  let carEf=Math.max(G.car-(G.tornozeleira?2:0),0);
+  let chance=carEf*9+(G.apr>0?G.apr*5:0)+(npc.align==='bom'?20:0)+(npc.align==='mau'?-25:0)+Math.random()*10;
+  marcarNPCVisto(npc.t);
+  if(G.imundo)chance*=0.35;chance=Math.min(Math.max(chance,2),78);
+  if(Math.random()*100<chance){
+    const v=parseFloat(((npc.g?1.2:0.6)+(Math.random()*2)).toFixed(2));
+    G.money+=v;G.ganhosD+=v;sfx('coin');
+    showBriefResult(npc,pf('pedir_ok',npc.t),`<span style="color:var(--green)">+R$${fmt(v)}</span>`,'⏱ +'+cost+'min',true);
+    addLog('good',npc.e+' '+npc.nome+' deu R$'+fmt(v));
+  }else{
+    sfx('fail');
+    showBriefResult(npc,pf('pedir_no',npc.t),'<span style="color:var(--red)">Recusou</span>','⏱ +'+cost+'min',false);
+    addLog('bad',npc.e+' '+npc.nome+' não quis.');
+  }
+  checkRobbery();G.briefNPC=null;updateUI();
+  if(G.mins<DAY_END){}else checkAfterAction(_sam);
+}
+
+function doIntimidar(npc){
+  const cost=actCost(90,true);const _sam=isAfterMidnight();spendMins(cost);
+  const risco=intimidRisk()+(G.tornozeleira?20:0);
+  if(Math.random()*100<risco){
+    sfx('prison');G.intimidCount=0;
+    showBriefResult(npc,'PARA AÍ! POLÍCIA!','<span style="color:var(--red)">PRESO — alguém chamou a polícia!</span>','⏱ +'+cost+'min',false);
+    G.briefNPC=null;updateUI();
+    processarPrisao(200,'tentativa de assalto',true);
+    return;
+  }
+  G.intimidCount++;
+  G.intimidouHoje=true;
+  const facaMult=G.upgrades.faca?1.6:1;
+  const grotBonus=(G.imundo?25:0)+(G.dsBan*5)+alignBonus(npc,'intim');
+  let chance=Math.min(G.car*3+grotBonus+(G.upgrades.faca?35:0),90);
+  marcarNPCVisto(npc.t);
+  if(Math.random()*100<chance){
+    const v=parseFloat(((2+Math.random()*5)*facaMult).toFixed(2));
+    G.money+=v;G.ganhosD+=v;sfx('intim_ok');
+    showBriefResult(npc,pf('intim_ok',npc.t),`<span style="color:var(--acc)">Cedeu! +R$${fmt(v)}</span>`,'⏱ +'+cost+'min',true);
+    addLog('warn',npc.e+' '+npc.nome+' cedeu! R$'+fmt(v));
+  }else{
+    sfx('fail');
+    showBriefResult(npc,pf('intim_no',npc.t),'<span style="color:var(--red)">Não cedeu</span>','⏱ +'+cost+'min',false);
+    addLog('bad',npc.e+' '+npc.nome+' não cedeu.');
+  }
+  checkRobbery();G.briefNPC=null;updateUI();
+  if(G.mins<DAY_END){}else checkAfterAction(_sam);
+}
+
+function doVender(npc,bonus,preco,auto){
+  if(!canStillAct()){addLog('bad','Sem mais ações.');cancelarBriefing();return;}
+  const tipo=G.briefTipoVenda||'normal';
+  const qtyField=tipo==='caseira'?'pacocaCaseira':tipo==='turbinada'?'pacocaTurbinada':'pacocaNormal';
+  if((G[qtyField]||0)<=0){addLog('bad','Sem paçoca '+tipo+'!');cancelarBriefing();return;}
+  const cost=actCost(G.carrinho?50:70,true);
+
+  // Aparência < 3: chance do NPC fugir antes de comprar (perda de tempo)
+  if(!auto&&G.apr<3){
+    const fleeCh=Math.max((3-G.apr)*12,0); // apr=2→12%, apr=1→24%, apr=0→36%, apr=-1→48%
+    if(Math.random()*100<fleeCh){
+      const _sam=isAfterMidnight();spendMins(cost);
+      sfx('fail');
+      const fugas=['Deu meia-volta assim que te viu.','Virou o rosto e acelerou o passo.','Mal te olhou e foi embora.','Olhou pra você e desviou o caminho.'];
+      const fuga=fugas[Math.floor(Math.random()*fugas.length)];
+      showBriefResult(npc,fuga,'<span style="color:var(--red)">Fugiu — aparência muito baixa</span>','⏱ +'+cost+'min',false);
+      addLog('bad',npc.e+' '+npc.nome+': '+fuga+' (aparência '+G.apr+')');
+      G.briefNPC=null;updateUI();
+      if(G.mins>=DAY_END)checkAfterAction(_sam);
+      return;
+    }
+  }
+
+  const base=G.car*6+(G.apr>0?G.apr*4:0)+(G.carrinho?15:0);
+  let chance=Math.min(base+bonus,85);if(G.imundo)chance=Math.max(chance*0.35,2);
+  // Concorrente ativo sem carrinho: 10% chance NPC rejeitar dizendo que comprou com concorrente
+  if(G.concorrenteAtivo&&!G.concorrenteSumiu&&!G.carrinho&&!auto){
+    if(Math.random()<0.10){
+      const _sam=isAfterMidnight();spendMins(cost);sfx('fail');
+      showBriefResult(npc,'Já comprei com o cara ali... tava mais barato.','<span style="color:var(--red)">Comprou com o concorrente</span>','⏱ +'+cost+'min',false);
+      addLog('bad','😤 Concorrente roubou sua venda! Compre o carrinho pra resolver isso.');
+      G.briefNPC=null;updateUI();if(G.mins>=DAY_END)checkAfterAction(_sam);return;
+    }
+  }
+  const _sam=isAfterMidnight();spendMins(cost);
+  if(Math.random()*100<chance||auto){
+    const qtyAvail=G[qtyField]||0;
+    const qtd=Math.min(Math.floor(Math.random()*3)+1,qtyAvail);
+    const total=parseFloat((preco*qtd).toFixed(2));
+    sfx('coin');G.money+=total;G[qtyField]-=qtd;G.vendidos+=qtd;G.ganhosD+=total;G.vendaGanhoTotal+=total;
+    // Fidelidade (só paçoca normal)
+    if(tipo==='normal'){
+      if(npc.t&&!G.clientesFieis[npc.t])G.clientesFieis[npc.t]=0;
+      if(npc.t)G.clientesFieis[npc.t]++;
+      if(G.clientesFieis[npc.t]===3)addLog('good','⭐ '+npc.nome+' virou cliente fiel!');
+    }
+    const icon=tipo==='caseira'?'🥘':tipo==='turbinada'?'⚪':'🥜';
+    const msg=qtd>1?pf('venda_ok',npc.t)+' (×'+qtd+'!)':pf('venda_ok',npc.t);
+    showBriefResult(npc,msg,`<span style="color:var(--green)">+${qtd}×${icon} · +R$${fmt(total)}</span>`,'⏱ +'+cost+'min',true);
+    addLog('good',npc.e+' '+npc.nome+' — '+qtd+'x R$'+fmt(total)+'!');
+    updateLinkedIn();
+  }else{
+    sfx('fail');
+    showBriefResult(npc,pf('venda_no',npc.t),'<span style="color:var(--red)">Não quis</span>','⏱ +'+cost+'min',false);
+    addLog('bad',npc.e+' '+npc.nome+': não quis.');
+  }
+  checkRobbery();G.briefNPC=null;updateUI();
+  if(G.mins>=DAY_END)checkAfterAction(_sam);
+}
+function executarVendaTurb(isDependente){
+  const npc=G.briefNPC||randNPC(false);
+  const cost=actCostVender();const _sam=isAfterMidnight();spendMins(cost);
+  if(isDependente){
+    // Dependente paga R$50
+    if((G.pacocaTurbinada||0)<=0){showBriefResult(npc,'...','<span style="color:var(--red)">Sem turbinada pra vender</span>','⏱ +'+cost+'min',false);G.briefNPC=null;updateUI();return;}
+    G.pacocaTurbinada--;G.money+=50;G.ganhosD+=50;G.vendaGanhoTotal+=50;
+    sfx('coin');showBriefResult(npc,'Você tem mais?! Me dá!',`<span style="color:var(--green)">Dependente pagou R$50! +⚪</span>`,'⏱ +'+cost+'min',true);
+    addLog('warn',npc.e+' '+npc.nome+' (dependente) pagou R$50!');
+  }else{
+    // Amostra grátis — vicia
+    if((G.pacocaTurbinada||0)<=0){showBriefResult(npc,'...','<span style="color:var(--red)">Sem turbinada</span>','⏱ +'+cost+'min',false);G.briefNPC=null;updateUI();return;}
+    G.pacocaTurbinada--;
+    if(!G.dependentes)G.dependentes={};
+    G.dependentes[npc.t]=true;
+    sfx('coin');showBriefResult(npc,'Hm... que negócio é esse? Deixa eu tentar uma...','<span style="color:var(--orange)">Amostra dada — dependente! Próxima vez R$50</span>','⏱ +'+cost+'min',true);
+    addLog('warn',npc.e+' '+npc.nome+' aceitou a "cocadinha". Virou dependente!');
+  }
+  marcarNPCVisto(npc.t);G.briefNPC=null;G.briefTipoVenda=null;updateUI();
+  if(G.mins>=DAY_END)checkAfterAction(_sam);
+}
+function executarVendaLote(){
+  const npc=G.briefNPC||randNPC(false);
+  if((G.pacocaNormal||0)<5){addLog('bad','Não tem 5 paçocas normais pra vender em lote!');cancelarBriefing();return;}
+  const cost=actCostVender();const _sam=isAfterMidnight();spendMins(cost);
+  const base=G.car*6+(G.apr>0?G.apr*4:0)+(G.carrinho?15:0)+20;
+  let chance=Math.min(base,92);if(G.imundo)chance=Math.max(chance*0.35,2);
+  if(Math.random()*100<chance){
+    const preco=5.0;
+    sfx('coin');G.money+=preco;G.pacocaNormal-=5;G.vendidos+=5;G.ganhosD+=preco;G.vendaGanhoTotal+=preco;
+    showBriefResult(npc,'Boa, vou levar as 5!',`<span style="color:var(--green)">+5×🥜 · +R$5,00</span>`,'⏱ +'+cost+'min',true);
+    addLog('good',npc.e+' '+npc.nome+' — lote de 5x! +R$5,00');
+    updateLinkedIn();
+  }else{
+    sfx('fail');
+    showBriefResult(npc,'Não preciso de tanto...','<span style="color:var(--red)">Recusou o lote</span>','⏱ +'+cost+'min',false);
+    addLog('bad',npc.e+' '+npc.nome+': não quis o lote.');
+  }
+  marcarNPCVisto(npc.t);checkRobbery();G.briefNPC=null;G.briefTipoVenda=null;updateUI();
+  if(G.mins>=DAY_END)checkAfterAction(_sam);
+}
+
+function doCaixa(){
+  if(G.briefingAtivo){showBriefIdle();G.briefNPC=null;}
+  const cost=actCost(30,false);
+  if(G.money<15){addLog('bad','Sem grana!');return;}
+  sfx('buy');G.money-=15;G.pacocaNormal=(G.pacocaNormal||0)+30;G.gastosD+=15;G.gastosDetalhe.push({desc:'Caixa de paçoca',v:15});const _sam=isAfterMidnight();spendMins(cost);
+  addLog('good','+30 paçocas (+'+cost+'min)');updateUI();
+  if(G.mins>=DAY_END)checkAfterAction(_sam);
+}
+function doComer(){
+  if(G.briefingAtivo){showBriefIdle();G.briefNPC=null;}
+  if(G.comida){addLog('info','Já comeu hoje!');return;}
+  const precoComer=G.promocaoRestaurante?5:8;
+  if(G.money<precoComer){addLog('bad','Sem grana pra comer!');return;}
+  sfx('eat');G.money-=precoComer;G.comida=true;G.gastosD+=precoComer;G.gastosDetalhe.push({desc:'Comida'+(G.promocaoRestaurante?' (promoção R$5!)':''),v:precoComer});
+  if(G.dsCom>0){const rec=Math.min(G.dsCom,G.bcar-G.car);if(rec>0){G.car=Math.min(G.car+rec,G.bcar);addLog('info','Carisma recuperou +'+rec+' após comer.');}}
+  const _sam=isAfterMidnight();G.hp=Math.min(G.hp+10,100);spendMins(60);
+  addLog('good','Comeu. +10 HP (+1h)'+(G.promocaoRestaurante?' 🍽 Promoção R$5!':''));updateUI();
+  if(G.mins>=DAY_END)checkAfterAction(_sam);
+}
+function doBanho(){
+  if(G.briefingAtivo){showBriefIdle();G.briefNPC=null;}
+  if(G.banho){addLog('info','Já tomou banho!');return;}
+  const gratis=moradiaTemBanho()||(G.kitHig>0);
+  if(!gratis&&G.money<5){addLog('bad','Sem grana pro banho!');return;}
+  if(!gratis){G.money-=5;G.gastosD+=5;G.gastosDetalhe.push({desc:'Banho (ducha pública)',v:5});}else if(G.kitHig>0&&!moradiaTemBanho())G.kitHig--;
+  const _sam=isAfterMidnight();sfx('shower');G.banho=true;spendMins(30);
+  G.apr=G.bapr;G.imundo=false;G.dsBan=0;
+  addLog('good','Tomou banho! Aparência ok.'+(gratis?' (grátis!)':''));updateUI();
+  if(G.mins>=DAY_END)checkAfterAction(_sam);
+}
+function doComerPacoca(){
+  if(G.briefingAtivo){showBriefIdle();G.briefNPC=null;}
+  if(G.comida){addLog('info','Já comeu hoje!');return;}
+  if(G.pacocaNormal<20){addLog('bad','Precisa de pelo menos 20 paçocas pra isso.');return;}
+  const _sam=isAfterMidnight();G.pacocaNormal-=20;G.comida=true;G.hp=Math.max(G.hp-5,1);spendMins(20);
+  addLog('warn','Comeu 20 paçocas direto. A fome passou... mas isso não é comida de verdade. -5 HP.');
+  addLog('info','"Você está comendo o seu produto!" — Coach Finotti, se soubesse.');
+  updateUI();
+  if(G.mins>=DAY_END)checkAfterAction(_sam);
+}
+function doDormir(){
+  G.briefNPC=null;
+  const late=G.mins>=DAY_END;
+  const semCasa=!G.moradiaId&&late;
+  G.descanso=true;showBriefIdle();sfx('sleep');
+  if(semCasa&&!G.timedState){
+    // Slept outside after midnight without timedState set — treat as exhausted
+    G.timedState='exhausted';
+    addLog('bad','Dormiu na rua! Penalidade grave amanhã.');
+  } else if(G.timedState==='exhausted'){
+    addLog('bad','😵 Dormiu exausto. Penalidade grave amanhã!');
+  } else if(G.timedState==='tired'){
+    addLog('warn','Dormiu cansado — ação cruzou a meia-noite. Pequena penalidade amanhã.');
+  } else {
+    addLog('good','Dormiu na hora certa. Bom descanso!');
+  }
+  G.lastActUsed=false;
+  endDay();
+}
+
+function checkRobbery(){
+  if(G.money<=0&&G.pacoca<=0)return;
+  const robM=Math.random()<0.005,robP=Math.random()<0.001;
+  if(!robM&&!robP)return;
+  const assaltante={e:'🥷',nome:'Assaltante',t:'roubo',ctx:'Surgiu do nada. Cara coberta.',isPol:false,g:false};
+  const msg=F.roubo.msgs[Math.floor(Math.random()*F.roubo.msgs.length)];
+  sfx('roubo');
+  G.briefingAtivo=true; // lock buttons during robbery
+  showBriefActive(assaltante, msg,
+    (G.upgrades.faca?
+      '<button class="r" onclick="reagirAssalto('+robM+','+robP+')" style="width:100%;margin:3px 0">🔪 Reagir com faca (50% funciona, senão -25 HP)</button>':
+      '<button class="orange" onclick="reagirAssalto('+robM+','+robP+')" style="width:100%;margin:3px 0">✊ Reagir no braço (30% funciona, -25 HP se falhar)</button>'
+    )+
+    '<button onclick="cederAssalto('+robM+','+robP+')" style="width:100%;margin:3px 0">😨 Entregar e não reagir</button>'
+  );
+  addLog('bad','🥷 ASSALTO! '+msg);
+}
+function reagirAssalto(rM,rP){
+  const temFaca=G.upgrades.faca;
+  const chance=temFaca?0.5:0.3;
+  if(Math.random()<chance){
+    const fuga=F.roubo.fuga[Math.floor(Math.random()*F.roubo.fuga.length)];
+    sfx('coin');
+    showBriefResult({e:'🥷',nome:'Assaltante',t:'roubo'},fuga,'<span style="color:var(--green)">Rechaçado!</span>','',true);
+    addLog('good','Reagiu! '+fuga);
+  }else{
+    G.hp=Math.max(G.hp-25,0);sfx('fail');
+    cederAssaltoSilent(rM,rP);
+    addLog('bad','Tentou reagir mas levou um soco! -25 HP.');
+    if(G.hp<=0)gameOver('Saúde chegou a zero durante assalto.\nSaldo: R$'+fmt(G.money));
+  }
+  updateUI();
+}
+function cederAssalto(rM,rP){
+  cederAssaltoSilent(rM,rP);
+  const assaltante={e:'🥷',nome:'Assaltante',t:'roubo'};
+  showBriefResult(assaltante,'...','<span style="color:var(--red)">Levaram tudo e foram embora.</span>','',false);
+  updateUI();
+}
+function cederAssaltoSilent(rM,rP){
+  if(rP&&G.pacoca>0){addLog('bad','🥷 Roubaram todas as paçocas!');G.pacoca=0;}
+  if(rM&&G.money>0){const v=Math.min(parseFloat((G.money*0.4+Math.random()*8).toFixed(2)),G.money);G.money-=v;addLog('bad','🥷 Roubaram R$'+fmt(v)+'!');}
+}
+
+function processarPrisao(multa,crime,showOpts){
+  sfx('policia');
+  if(G.tornozeleira){
+    setTimeout(()=>{
+      deleteSave();sfx('tiro');
+      document.getElementById('torn-crime').textContent=crime;
+      document.getElementById('torn-divida').textContent=fmt(Math.abs(G.money));
+      setTimeout(()=>{document.getElementById('s-over-torn').classList.add('flash-red');goTo('s-over-torn');},400);
+    },300);
+    return;
+  }
+  G.money-=multa;G.pacoca=0;G.day+=2;G.hp=Math.max(G.hp-20,0);
+  if(G.money<0){G.tornozeleira=true;G.tornozeleiraDivida=Math.abs(G.money);}
+  addLog('bad','PRESO por '+crime+'! -R$'+fmt(multa)+', +2 dias cadeia.');
+  if(showOpts){
+    // Show arrest choice IN the briefing panel (not purple modal)
+    const polNpc={e:'👮',nome:'Policial',ctx:'',isPol:true};
+    showBriefActive(polNpc,
+      'Você está preso por '+crime+'.\nMulta: R$'+fmt(multa)+' | +2 dias cadeia.',
+      '<button class="g" onclick="renderderPrisao()" style="width:100%;margin:3px 0;font-size:13px">🤝 Se render — cumprir a pena</button>'+
+      '<button class="r" onclick="resistirPrisao()" style="width:100%;margin:3px 0;font-size:13px">⚡ Resistir à abordagem</button>'
+    );
+    // keep briefingAtivo=true so buttons are blocked
+  }
+  updateUI();
+}
+function renderderPrisao(){
+  showBriefIdle();
+  addLog('info','Se rendeu. Pena cumprida. +2 dias perdidos.');
+  updateUI();
+}
+function resistirPrisao(){
+  closeModal();deleteSave();sfx('tiro');
+  setTimeout(()=>{
+    document.getElementById('resist-saldo').textContent=fmt(G.money);
+    goTo('s-over-resist');
+  },500);
+}
+function gameOver(msg){
+  deleteSave(); // apaga save imediatamente ao morrer
+  document.getElementById('go-msg').innerHTML=(msg||'').replace(/\n/g,'<br>');
+  document.getElementById('go-title').textContent='GAME OVER';
+  document.getElementById('go-icon').textContent='😵';
+  goTo('s-over');
+}
+
+function checkCalendarDay(){
+  G.calDay++;
+  if(G.calDay>28){G.calDay=1;G.calMonth++;processarDividaMensal();}
+}
+function processarDividaMensal(){
+  if(G.moradiaId&&G.moradiaMode==='aluguel'){
+    const val=G.moradiaId==='kitnet'?400:800;
+    G.money-=val;G.gastosD+=val;G.gastosDetalhe.push({desc:'Aluguel',v:val});
+    if(G.money<-600){G.moradiaId=null;G.moradiaMode=null;addLog('bad','DESPEJADO! Voltou pra barraca.');}
+    else if(G.money<0)addLog('bad','Aluguel debitado mas ficou negativo! Dívida.');
+    else addLog('warn','Aluguel pago: -R$'+val);
+  }
+  if(G.financDivida>0){
+    if(G.money>=G.financParcela){
+      G.money-=G.financParcela;G.gastosD+=G.financParcela;G.gastosDetalhe.push({desc:'Parcela financiamento',v:G.financParcela});
+      G.financDivida=Math.max(G.financDivida-G.financParcela,0);
+      G.financMissed=0;
+      addLog('warn','Parcela paga: -R$'+G.financParcela+'. Restante: R$'+fmt(G.financDivida));
+      if(G.financDivida===0)addLog('good','Imóvel quitado! É seu!');
+    }else{
+      G.financMissed=(G.financMissed||0)+1;
+      addLog('bad','Sem grana pra parcela! Atraso '+(G.financMissed)+'/3.');
+      if(G.financMissed>=3){
+        addLog('bad','3 parcelas em atraso! O banco tomou o imóvel.');
+        G.moradiaId=null;G.moradiaMode=null;G.financDivida=0;G.financParcela=0;G.financMissed=0;
+        if(G.upgrades['kitnet_financiar']){G.bcar=Math.max(G.bcar-1,0);G.car=Math.min(G.car,G.bcar);}
+        if(G.upgrades['apto_financiar']){G.bcar=Math.max(G.bcar-2,0);G.car=Math.min(G.car,G.bcar);G.bapr=Math.max(G.bapr-1,0);G.apr=Math.min(G.apr,G.bapr);}
+      }
+    }
+  }
+  if(G.money<0&&!G.tornozeleira){G.tornozeleira=true;G.tornozeleiraDivida=Math.abs(G.money);addLog('bad','🦶 Dívida! TORNOZELEIRA ELETRÔNICA!');}
+  else if(G.tornozeleira){G.tornozeleiraDivida=Math.abs(Math.min(G.money,0));if(G.money>=0){G.tornozeleira=false;G.tornozeleiraDivida=0;addLog('good','Dívida quitada! Tornozeleira removida.');}}
+}
+
+function endDay(){
+  goTo('s-endday');document.getElementById('ed-day').textContent=G.day;
+
+  const saldoAntes=G.money+G.gastosD-G.ganhosD; // saldo no início do dia
+  const lucro=G.ganhosD-G.gastosD;
+
+  // ── BUILD REPORT HTML ──────────────────────────────────
+  let repHtml='';
+
+  // Resumo financeiro
+  repHtml+='<div style="color:var(--acc);font-size:14px;margin-bottom:6px;letter-spacing:1px">💰 FINANCEIRO</div>';
+  repHtml+='<div class="row"><span style="color:var(--text2)">Ganhos do dia</span><span style="color:var(--green)">+R$'+fmt(G.ganhosD)+'</span></div>';
+
+  if(G.gastosD>0){
+    repHtml+='<div class="row" style="margin-top:2px"><span style="color:var(--text2)">Gastos do dia</span><span style="color:var(--red)">-R$'+fmt(G.gastosD)+'</span></div>';
+    // Breakdown de gastos
+    if(G.gastosDetalhe.length>0){
+      G.gastosDetalhe.forEach(g=>{
+        repHtml+='<div class="row" style="padding-left:12px;font-size:12px"><span style="color:var(--text3)">↳ '+g.desc+'</span><span style="color:#f87171">-R$'+fmt(g.v)+'</span></div>';
+      });
+    }
+  }
+
+  repHtml+='<div style="border-top:1px solid var(--border);margin:6px 0;padding-top:4px" class="row"><span style="color:var(--text2)">Resultado líquido</span><span style="color:'+(lucro>=0?'var(--green)':'var(--red)')+'">'+( lucro>=0?'+':'')+fmt(lucro)+'</span></div>';
+  repHtml+='<div class="row"><span style="color:var(--text2)">Saldo atual</span><span style="color:var(--acc);font-size:16px">R$'+fmt(G.money)+'</span></div>';
+
+  // Atividade
+  repHtml+='<div style="color:var(--acc);font-size:14px;margin:10px 0 6px;letter-spacing:1px">📦 ATIVIDADE</div>';
+  repHtml+='<div class="row"><span style="color:var(--text2)">Paçocas vendidas</span><span style="color:var(--text)">'+G.vendidos+' un.</span></div>';
+  repHtml+='<div class="row"><span style="color:var(--text2)">Saúde atual</span><span style="color:'+(G.hp>50?'var(--green)':G.hp>25?'var(--acc)':'var(--red)')+'">'+G.hp+'/100</span></div>';
+
+  // Status do dia
+  const statusItems=[];
+  if(G.comida)statusItems.push('<span style="color:var(--green)">✅ Comida</span>');
+  else statusItems.push('<span style="color:var(--red)">❌ Sem comer</span>');
+  if(G.banho)statusItems.push('<span style="color:var(--green)">✅ Banho</span>');
+  else statusItems.push('<span style="color:var(--red)">❌ Sem banho</span>');
+  if(G.descanso)statusItems.push('<span style="color:var(--green)">✅ Descansou</span>');
+  else statusItems.push('<span style="color:var(--red)">❌ Sem descanso</span>');
+  repHtml+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;font-size:13px">'+statusItems.join('')+'</div>';
+
+  // Moradia e dívidas
+  if(G.moradiaId||G.financDivida>0||G.tornozeleira){
+    repHtml+='<div style="color:var(--acc);font-size:14px;margin:10px 0 6px;letter-spacing:1px">🏠 SITUAÇÃO</div>';
+    if(G.moradiaId)repHtml+='<div class="row"><span style="color:var(--text2)">Moradia</span><span style="color:var(--text)">'+nomeMoradia()+'</span></div>';
+    if(G.financDivida>0)repHtml+='<div class="row"><span style="color:var(--text2)">Dívida banco</span><span style="color:var(--red)">R$'+fmt(G.financDivida)+'</span></div>';
+    if(G.tornozeleira)repHtml+='<div class="row"><span style="color:var(--text2)">Tornozeleira</span><span style="color:var(--orange)">🦶 ATIVA — dívida R$'+fmt(G.tornozeleiraDivida)+'</span></div>';
+  }
+
+  // Meta
+  const pct=(G.money/1000000*100);
+  repHtml+='<div style="color:var(--text3);font-size:11px;margin-top:8px;border-top:1px solid var(--border);padding-top:6px">';
+  repHtml+='Meta: R$'+fmt(G.money)+' / R$1.000.000 ('+pct.toFixed(4)+'%)';
+  repHtml+='</div>';
+
+  const pens=[];
+  if(!G.comida){
+    G.dsCom++;const dmg=Math.min(G.dsCom*4,20),cl=Math.min(G.dsCom,3);
+    G.hp=Math.max(G.hp-dmg,0);G.car=Math.max(G.car-cl,0);
+    pens.push('Sem comer: -'+dmg+' HP, -'+cl+' carisma ('+G.dsCom+'º dia)');
+  }else G.dsCom=0;
+  if(!G.banho){
+    G.dsBan++;G.apr=Math.max(G.bapr-G.dsBan,-1);if(G.apr<=-1)G.imundo=true;
+    pens.push('Sem banho: aparência → '+G.apr+(G.imundo?' — IMUNDO!':'')+ ' ('+G.dsBan+'º dia)');
+  }else G.dsBan=0;
+  if(!G.descanso){
+    // Didn't sleep at all — full miss, accumulate
+    G.dsDes++;
+    const agiLoss=3*Math.min(G.dsDes,3);
+    const dmg=Math.min(G.dsDes*5,20);
+    G.hp=Math.max(G.hp-dmg,0);
+    G.agiDebuff=(G.agiDebuff||0)+agiLoss; // accumulate debuff
+    G.agi=G.bagi-G.agiDebuff;
+    pens.push('Sem dormir ('+G.dsDes+'º dia): -'+dmg+' HP, -'+agiLoss+' agi → agi: '+G.agi);
+  }else{
+    // Slept — apply tired/exhausted penalty if applicable, then check recovery
+    if(G.timedState==='exhausted'){
+      G.agiDebuff=(G.agiDebuff||0)+3;
+      G.agi=G.bagi-G.agiDebuff;G.hp=Math.max(G.hp-20,0);
+      pens.push('EXAUSTO (agiu após meia-noite): -20 HP, -3 agi → agi: '+G.agi);
+    }else if(G.timedState==='tired'){
+      G.agiDebuff=(G.agiDebuff||0)+1;
+      G.agi=G.bagi-G.agiDebuff;
+      pens.push('CANSADO (ação cruzou meia-noite): -1 agi → agi: '+G.agi);
+    }else{
+      // Dormiu no horário — recupera debuffs de agilidade
+      if((G.agiDebuff||0)>0){
+        G.agiDebuff=0;
+        G.agi=G.bagi;
+        pens.push('✅ Descansou — agilidade recuperada → agi: '+G.agi);
+      }
+    }
+    G.dsDes=0;
+    G.timedState=null;
+  }
+  checkCalendarDay();
+  if(G.tornozeleira){G.tornozeleiraDivida=Math.abs(Math.min(G.money,0));if(G.money>=0){G.tornozeleira=false;G.tornozeleiraDivida=0;}}
+
+  document.getElementById('ed-rep').innerHTML=repHtml;
+  const pe=document.getElementById('ed-pen');
+  if(pens.length){
+    pe.style.display='block';
+    pe.innerHTML='<div style="color:var(--red);font-size:14px;margin-bottom:6px;letter-spacing:1px">⚠ PENALIDADES DO DIA</div>'+
+      pens.map(p=>'<div style="color:#f87171;margin-bottom:4px;font-size:13px">• '+p+'</div>').join('');
+  }else{
+    pe.style.display='block';
+    pe.innerHTML='<div style="color:var(--green);font-size:13px">✅ Nenhuma penalidade hoje. Bom trabalho!</div>';
+    pe.className='box green';
+  }
+  const ce=document.getElementById('ed-coach');
+  if(Math.random()<0.35){ce.style.display='block';ce.innerHTML='<span style="color:var(--purple)">💼 Coach Finotti:</span><br>'+COACH_MSGS[Math.floor(Math.random()*COACH_MSGS.length)];}else ce.style.display='none';
+  if(G.hp<=0)setTimeout(()=>gameOver('Saúde chegou a zero.\nDias sem comer: '+G.dsCom+'\nSaldo: R$'+fmt(G.money)),300);
+  else saveGame(); // salva o estado ao fim de cada dia (após penalidades aplicadas)
+}
+
+function nextDay(){
+  if(G.hp<=0)return;
+  G.day++;G.mins=DAY_START;
+  G.comida=false;G.banho=false;G.descanso=moradiaTemDescanso();
+  G.briefingAtivo=false; // reset briefing lock for new day
+  G.lastActUsed=false;G.forcedExhausted=false;G.timedState=null;
+  // Sync agi to reflect current debuff state
+  G.agi=G.bagi-(G.agiDebuff||0);
+  // Save previous day's flags BEFORE resetting (loteria precisa)
+  const _loteriaBilhetesOntem=G.loteriaBilhetes;
+  G.vendidos=0;G.ganhosD=0;G.gastosD=0;G.gastosDetalhe=[];G.chuva=false;G.promocaoRestaurante=false;G.chuvaAvisada=false;G.pacocaCaseiraAtiva=false;G.loteriaBilhetes=0;G.intimidouHoje=false;G.npcVistoHoje={};G.briefTipoVenda=null;
+  // Dia sem intimidar: chance de prisão cai pela metade
+  if(!G.intimidouHoje&&G.intimidCount>0){
+    G.intimidCount=Math.floor(G.intimidCount/2);
+  }else{
+    G.intimidCount=Math.max(G.intimidCount-1,0);
+  }
+  G.intimidouHoje=false;
+  G.briefNPC=null;showBriefIdle();
+  if(G.aguardaEnt&&!G.entFeita){
+    G.entFeita=true;G.aguardaEnt=false;
+    if(Math.random()<0.3){
+      setTimeout(()=>{
+        showModal('📞 Ligação do Milionário Super-Mercado!','Parabéns! Selecionado para Repositor(a).\n\nSalário: R$1.412/mês | 6x1\n\nDeseja aceitar?');
+        setTimeout(()=>{const b=document.querySelector('#mod button:last-child');if(b)b.onclick=()=>{closeModal();goTo('s-win');};},80);
+      },400);return;
+    }else addLog('bad','O Milionário Super-Mercado não ligou. Tente de novo.');
+  }
+  addLog('info','Dia '+G.day+'. 08:00. Mês '+G.calMonth+', dia '+G.calDay+'.');
+  // ── EVENTOS DIÁRIOS ─────────────────────────────────────
+  // Chuva (20%)
+  if(Math.random()<0.20){G.chuva=true;addLog('warn','☔ Está chovendo! Todas as ações externas custam +30 min hoje.');}
+  // Promoção restaurante (15%)
+  if(Math.random()<0.15){G.promocaoRestaurante=true;addLog('info','🍽 Promoção no Restaurante Popular! Comida custa só R$5 hoje.');}
+  // Concorrente aparece no dia 5
+  if(G.day===5&&!G.concorrenteAtivo){
+    G.concorrenteAtivo=true;
+    G._eventoConcorrente=true;
+    addLog('warn','⚠ Um concorrente apareceu vendendo paçoca por R$0,50! Compre o carrinho pra se livrar dele.');
+  }
+  if(G.concorrenteAtivo&&!G.concorrenteSumiu&&G.upgrades.carrinho){
+    G.concorrenteSumiu=true;
+    addLog('good','✅ O concorrente viu seu carrinho e foi vender em outro bairro!');
+  }
+  // Curso coach expiry
+  if(G.courseDaysLeft>0){G.courseDaysLeft--;if(G.courseDaysLeft===0){G.bcar=Math.max(G.bcar-1,0);G.car=Math.min(G.car,G.bcar);addLog('info','📉 Efeito placebo do curso do Coach Finotti acabou. Carisma -1 de volta.');}}
+  // Ponto fixo: passivo de vendas (só se tiver paçoca)
+  if(G.pontoFixo&&G.pacoca>0){
+    const horas=Math.floor((DAY_END-DAY_START)/60);
+    const vendidas=Math.min(Math.floor(horas/2)+(Math.random()<0.5?1:0),G.pacoca);
+    const preco=G.pacocaCaseiraAtiva?2.0:1.5;
+    const ganho=parseFloat((vendidas*preco).toFixed(2));
+    if(vendidas>0){G.pacocaNormal=Math.max((G.pacocaNormal||0)-vendidas,0);G.money+=ganho;G.ganhosD+=ganho;G.vendaGanhoTotal+=ganho;addLog('good','📍 Ponto fixo vendeu '+vendidas+' paçocas passivamente! +R$'+fmt(ganho));}
+  }
+  // Sorteio loteria do dia anterior
+  if(_loteriaBilhetesOntem>0){
+    let ganhou=false;
+    for(let b=0;b<_loteriaBilhetesOntem;b++){
+      if(Math.random()<0.0001){ganhou=true;break;}
+    }
+    if(ganhou){
+      G._eventoLoteria=5000;
+      addLog('good','🎉🎉🎉 GANHOU NA LOTERIA! +R$5.000!');
+    }else{
+      addLog('bad','🎟 Loteria: não foi dessa vez. ('+_loteriaBilhetesOntem+' bilhete'+(_loteriaBilhetesOntem>1?'s':'')+')');
+    }
+  }
+  // Masterclass do coach (toda semana)
+  if(G.day%7===1&&!G.masterclassComprada){G.masterclassOferta=true;addLog('warn','📧 Coach Finotti te mandou convite pra masterclass R$500. Veja na loja!');}
+  // Masterclass: reveal se comprou na semana passada
+  if(G.masterclassComprada&&G.day%7===2){
+    addLog('warn','📄 Masterclass: você abriu o PDF. Página 1: Acorde cedo. Página 2: Trabalhe duro. Página 3: Repita. Fim do conteúdo.');
+    G.masterclassComprada=false; // pode comprar de novo na próxima semana... se quiser
+  }
+  // (Confisco movido pra durante a venda — não mais no nextDay)
+  // Agiota: cobra no último dia do mês
+  if(G.agiotaEmprestado&&G.calDay===28){
+    const devia=G.agiotaDivida;
+    if(G.money>=devia){
+      G.money-=devia;G.agiotaDivida=0;G.agiotaEmprestado=false;
+      addLog('warn','🤑 Agiota cobrou! Pagou R$'+fmt(devia)+' — livre da dívida.');
+    }else{
+      G._eventoAgiota=true;
+      addLog('bad','💀 O agiota apareceu. Você não tinha o dinheiro...');
+    }
+  }
+  if(G.agi<0)addLog('bad','⚡ Agilidade negativa ('+G.agi+')! Cada ação vai custar muito tempo.');
+  if(G.day%7===0)addLog('warn','Coach Finotti: "Semana '+Math.floor(G.day/7)+' concluída! 🚀"');
+  saveGame();
+  goTo('s-game');renderLoja();updateUI();
+  // Briefings de eventos mostrados APÓS a tela carregar
+  setTimeout(()=>mostrarEventosBriefing(),100);
+}
+
+function mostrarEventosBriefing(){
+  // Concorrente aparece no dia 5
+  if(G._eventoConcorrente){
+    G._eventoConcorrente=false;
+    const concNPC={e:'🤜',nome:'Vendedor Concorrente',ctx:'Apareceu do nada. Paçoca a R$0,50.',isPol:false,g:false,align:'neutro'};
+    showBriefActive(concNPC,'"PAÇOCA! SÓ CINQUENTA CENTAVOS! PAÇOCA BARATINHA!"',
+      '<button class="g" onclick="ignorarConcorrente()" style="width:100%;margin:3px 0">😤 Ignorar e continuar</button>');
+    return; // show one at a time
+  }
+  if(G._eventoLoteria){
+    const v=G._eventoLoteria;G._eventoLoteria=null;
+    G.money+=v;
+    showBriefActive({e:'🎟',nome:'Loteria',ctx:'',align:'neutro'},'"VOCÊ GANHOU! R$'+fmt(v)+'!"',
+      '<button class="g" onclick="cancelarBriefing()" style="width:100%;margin:3px 0">🤑 RECEBER OS PRÊMIOS</button>');
+    addLog('good','🎉🎉🎉 GANHOU NA LOTERIA! +R$'+fmt(v)+'!');
+    return;
+  }
+  if(G._eventoAgiota){
+    G._eventoAgiota=false;
+    deleteSave();
+    const agiNPC={e:'😈',nome:'Sr. Agiota',ctx:'Veio pessoalmente com os capangas.',isPol:false,g:false,align:'mau'};
+    showBriefActive(agiNPC,'"Você acha que pode não me pagar?! Vou te ensinar uma lição..."',
+      '<button class="r" onclick="gameOverAgiota()" style="width:100%;margin:3px 0">💀 Desfecho inevitável</button>');
+    addLog('bad','💀 O agiota apareceu. Você não tinha o dinheiro...');
+    return;
+  }
+}
+
+function updateUI(){
+  const s=id=>document.getElementById(id);
+  s('g-day').textContent=G.day;s('g-clock').textContent=minToHHMM(G.mins);
+  s('g-timeleft').textContent=timeLeft(G.mins);
+  const tp=timePerc(G.mins);s('g-timeperc').textContent=Math.round(Math.min(tp,100))+'%';
+  const tb=s('g-timebar');tb.style.width=Math.min(tp,100)+'%';
+  tb.style.background=tp>90?'var(--red)':tp>70?'var(--acc)':'var(--blue)';
+  const tw=s('time-warn');if(tw)tw.style.display=(G.mins>=DAY_WARN&&G.mins<DAY_END&&!G.descanso)?'block':'none';
+  if(s('tw-hour'))s('tw-hour').textContent=String(Math.floor(G.mins/60)%24).padStart(2,'0');
+  const law=s('last-act-warn');
+  if(law){
+    if(G.timedState==='exhausted'&&!G.descanso){
+      law.style.display='block';law.textContent='😵 EXAUSTO — só resta dormir!';
+    }else if(G.timedState==='tired'&&!G.descanso){
+      law.style.display='block';law.textContent='⚠ CANSADO — ação cruzou meia-noite. Ainda pode agir 1x mais.';
+    }else if(isAfterMidnight()&&!G.lastActUsed&&!G.timedState&&!G.descanso){
+      law.style.display='block';law.textContent='🌙 MEIA-NOITE — Ainda há uma ação disponível. Agir = EXAUSTO amanhã.';
+    }else{law.style.display='none';}
+  }
+  const torn=s('tornozeleira-bar');
+  if(torn){torn.style.display=G.tornozeleira?'block':'none';if(s('torn-debt'))s('torn-debt').textContent=fmt(G.tornozeleiraDivida);}
+  s('g-money').textContent=fmt(G.money);s('g-hp-n').textContent=G.hp+'/100';
+  const hpEl=s('g-hp');hpEl.style.width=Math.max(G.hp,0)+'%';hpEl.className='bfill hp'+(G.hp<30?' low':'');
+  s('g-car').textContent=G.car+(G.imundo?' [IMUNDO]':'')+(G.tornozeleira?' [-2]':'');
+  s('g-apr').textContent=G.apr+(G.apr<3&&!G.imundo?' ⚠':'');
+  const agiEl=s('g-agi');agiEl.textContent=G.agi;agiEl.style.color=G.agi<0?'var(--red)':G.agi===0?'var(--acc)':'var(--text)';
+  const pNorm=G.pacocaNormal||0,pCas=G.pacocaCaseira||0,pTurb=G.pacocaTurbinada||0;
+  s('g-pac').textContent=pNorm+(pCas>0?' 🥘'+pCas:'')+(pTurb>0?' ⚪'+pTurb:'');
+  // Calculate noAct early — needed for all button states
+  const noAct=!canStillAct()||G.briefingAtivo;
+  // Cost calculations first — used by multiple hints below
+  const chuvaTag=G.chuva?' ☔':'';
+  const pedCost=actCost(90,true),vndCost=actCost(G.carrinho?50:70,true),cxCost=actCost(30,false);
+  // Sell buttons visibility — show whenever there is stock (disabled separately handles noAct)
+  const bvCas=s('btn-vnd-cas');if(bvCas){bvCas.style.display=pCas>0?'block':'none';bvCas.disabled=noAct;}
+  const bvTurb=s('btn-vnd-turb');if(bvTurb){bvTurb.style.display=pTurb>0?'block':'none';bvTurb.disabled=noAct;}
+  const phCas=s('ph-vnd-cas');if(phCas)phCas.textContent=vndCost+'min'+chuvaTag;
+  const phTurb=s('ph-vnd-turb');if(phTurb)phTurb.textContent=vndCost+'min'+chuvaTag;
+  s('g-mor').textContent=nomeMoradia().split(' ').slice(0,2).join(' ');
+  const iw=s('imundo-warn');if(iw)iw.style.display=G.imundo?'block':'none';
+  const bbp=s('ph-ban');if(bbp)bbp.textContent=(moradiaTemBanho()||G.kitHig>0?'Grátis':'R$5')+' · 30min';
+  s('lj-money').textContent=fmt(G.money);
+  const pp=s('ph-ped');if(pp)pp.textContent=pedCost+'min'+chuvaTag;
+  const pv=s('ph-vnd');if(pv)pv.textContent=vndCost+'min'+chuvaTag;
+  const pc=s('ph-cx');if(pc)pc.textContent='R$15 · '+cxCost+'min';
+  [{id:'n-com',ok:G.comida,l:'🍽 Comida'},{id:'n-ban',ok:G.banho,l:'🚿 Banho'},{id:'n-des',ok:G.descanso,l:'😴 Descanso'}]
+    .forEach(n=>{const e=s(n.id);e.className='need '+(n.ok?'ok':'bad');e.innerHTML=n.l+'<br>'+(n.ok?'✅':'❌');});
+  s('st-mor').textContent=(G.moradiaId?'🏠':'🏚')+' '+nomeMoradia()+(G.moradiaMode?' ('+G.moradiaMode+')':'');
+  s('st-money2').textContent='R$'+fmt(G.money);
+  const dRow=s('st-divida-row'),pRow=s('st-parc-row'),mRow=s('st-missedrow');
+  const hasFinanc=G.financDivida>0;
+  if(dRow)dRow.style.display=hasFinanc?'flex':'none';
+  if(pRow)pRow.style.display=hasFinanc?'flex':'none';
+  if(mRow)mRow.style.display=(hasFinanc&&G.financMissed>0)?'flex':'none';
+  const sd=s('st-divida'),sp=s('st-parc'),sm=s('st-missed'),spmes=s('st-parc-mes');
+  if(sd)sd.textContent='R$'+fmt(G.financDivida);
+  if(sp)sp.textContent='R$'+G.financParcela;
+  if(spmes)spmes.textContent=G.calMonth;
+  if(sm)sm.textContent=G.financMissed+'/3';
+  s('st-car-b').textContent=G.car+'/'+G.bcar;
+  s('st-apr-b').textContent=G.apr+'/'+G.bapr;
+  s('st-agi-b').textContent=G.agi+'/'+G.bagi;
+  const pen=[];
+  if(G.dsCom>0)pen.push('Sem comer: -'+Math.min(G.dsCom,3)+' carisma/dia');
+  if(G.imundo)pen.push('IMUNDO: -40% negociações');
+  if(G.dsDes>0)pen.push('Cansaço: -'+Math.min(G.dsDes,3)+' agilidade/dia');
+  if(G.tornozeleira)pen.push('TORNOZELEIRA: -2 carisma, +20% intim detectada');
+  s('st-pen').innerHTML=pen.length?pen.join('<br>'):'Nenhuma ✓';
+  const pct=Math.min((G.money/1000000)*100,100);
+  s('st-pct').textContent=pct.toFixed(4)+'%';s('st-bar').style.width=pct+'%';
+  s('st-kit').textContent=G.moradiaId==='kitnet'?'Sim':'Não';
+  s('st-quit').textContent=G.moradiaId==='apto'?'Sim':'Não';
+  s('st-ent').textContent=G.entFeita?'Feita':(G.aguardaEnt?'Aguardando':'Não');
+  s('st-dc').textContent=G.dsCom;s('st-db').textContent=G.dsBan;s('st-dd').textContent=G.dsDes;
+  updateLinkedIn();
+  const sli=s('st-linkedin');if(sli)sli.textContent=linkedinTitle();
+  const svt=s('st-vendaTotal');if(svt)svt.textContent='Vendas totais: R$'+fmt(G.vendaGanhoTotal||0);
+  // Eventos ativos
+  const chuvaBar=document.getElementById('chuva-bar');
+  if(chuvaBar)chuvaBar.style.display=G.chuva?'block':'none';
+  const promBar=document.getElementById('prom-bar');
+  if(promBar)promBar.style.display=G.promocaoRestaurante?'block':'none';
+  const agiotaBar=document.getElementById('agiota-bar');
+  if(agiotaBar){agiotaBar.style.display=G.agiotaEmprestado?'block':'none';const ad=document.getElementById('agiota-debt');if(ad)ad.textContent=fmt(G.agiotaDivida);}
+  s('btn-ped').disabled=noAct;
+  s('btn-vnd').disabled=noAct||pNorm<=0;
+  s('btn-cx').disabled=noAct||G.money<15;
+  const precoComerUI=G.promocaoRestaurante?5:8;
+  const phCom=s('ph-com');if(phCom)phCom.textContent=(G.promocaoRestaurante?'🍽 R$5':'R$8')+' · 1h';
+  s('btn-com').disabled=noAct||G.money<precoComerUI||G.comida;
+  const bGratis=moradiaTemBanho()||G.kitHig>0;
+  s('btn-ban').disabled=noAct||(!bGratis&&G.money<5)||G.banho;
+  s('btn-dor').disabled=false;
+  // Comer paçoca button: show only if has 20+ paçocas and hasn't eaten
+  const cpac=s('btn-cpac');
+  if(cpac)cpac.style.display=((G.pacocaNormal||0)>=20&&!G.comida)?'block':'none';
+  const ii=s('intim-info');if(ii)ii.style.display=(G.intimidCount>0||G.tornozeleira)?'block':'none';
+  const ic=s('ic');if(ic)ic.textContent=G.intimidCount;
+  const ir=s('ir');if(ir){const r=intimidRisk();ir.textContent='~'+Math.round(r)+'%';ir.style.color=r>30?'#f87171':r>15?'#fbbf24':'#4ade80';}
+  const eb=s('ent-btn');if(eb)eb.style.display=(G.moradiaId&&!G.aguardaEnt&&!G.entFeita)?'block':'none';
+  if(Math.random()<0.015)showCoach();
+}
+
+function updateLinkedIn(){
+  if(!G.linkedinSet)G.linkedinSet=true;
+  if(G.entFeita||G.aguardaEnt){G.linkedinTier=2;return;}
+  if(G.vendaGanhoTotal>=10000)G.linkedinTier=1;
+  else G.linkedinTier=0;
+}
+function linkedinTitle(){
+  if(G.linkedinTier===2)return '🏪 Colaborador — Milionário Super-Mercado';
+  if(G.linkedinTier===1)return '👑 CEO da Paçoca S.A.';
+  return '🥜 Microempreendedor Paçoca S.A.';
+}
+function pedirAgiota(){
+  const vals=[50,100,150,200];const v=vals[Math.floor(Math.random()*vals.length)];
+  const juros=Math.round(v*0.2);
+  G.money+=v;G.agiotaDivida=v+juros;G.agiotaEmprestado=true;
+  addLog('warn','🤑 Agiota emprestou R$'+v+'. Pague R$'+G.agiotaDivida+' no último dia do mês ou...');
+}
+function ignorarConcorrente(){cancelarBriefing();}
+function gameOverAgiota(){
+  closeModal();cancelarBriefing();
+  deleteSave();
+  document.getElementById('go-icon').textContent='😈';
+  document.getElementById('go-title').textContent='ASSASSINADO';
+  document.getElementById('go-msg').innerHTML='O agiota mandou os capangas.<br><br>Você não tinha o dinheiro.<br>Eles não aceitaram desculpas.<br><br><em style="color:var(--text3)">Coach Finotti, ao saber da notícia, postou:<br>"Dívida é corrente dourada — se você não a quitar, ela te acorrenta literalmente. 🚀<br>#mindset #empreendedorismo #RIP"</em>';
+  goTo('s-over');
+}
+function showCoach(){const b=document.getElementById('coach-pop');if(!b)return;b.innerHTML='<span style="color:var(--purple)">💼 Coach Finotti:</span><br>'+COACH_MSGS[Math.floor(Math.random()*COACH_MSGS.length)];b.style.display='block';setTimeout(()=>b.style.display='none',4500);}
+function showModal(t,b){document.getElementById('mod-t').textContent=t;document.getElementById('mod-b').textContent=b;document.getElementById('mod-x').innerHTML='';document.getElementById('mod').classList.add('on');}
+function closeModal(){document.getElementById('mod').classList.remove('on');}
+function abrirEnt(){if(G.car<2||G.apr<0){showModal('Requisitos','- Carisma mín.: 2\n- Aparência não-negativa');return;}document.getElementById('ent-b').innerHTML='O gerente já te viu vendendo paçoca...<br><br>Carisma: <b>'+G.car+'</b> | Aparência: <b>'+G.apr+'</b><br>Chance: ~30%';document.getElementById('entm').classList.add('on');}
+function fecharEnt(){document.getElementById('entm').classList.remove('on');}
+function fazerEnt(){fecharEnt();G.aguardaEnt=true;addLog('info','Entrevista feita! Aguardando...');updateUI();}
+function setTab(t){
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(el=>{if(el.textContent.trim().toLowerCase()===t)el.classList.add('on');});
+  document.getElementById('tab-acoes').style.display=t==='acoes'?'block':'none';
+  document.getElementById('tab-loja').style.display=t==='loja'?'block':'none';
+  document.getElementById('tab-status').style.display=t==='status'?'block':'none';
+  if(t==='loja')renderLoja();
+}
+function renderLoja(){
+  const el=document.getElementById('loja-items');if(!el)return;
+  el.innerHTML=UPGRADES.map(u=>{
+    const jatem=u.unico&&G.upgrades[u.id];
+    const semreq=u.req&&!u.req();
+    const hint=jatem?'✓ Adquirido':(semreq?(u.reqMsg||'Bloqueado'):'');
+    return `<div class="sitem" style="${jatem?'opacity:0.45':''}${(u.id==='crack'||u.id==='faca')?';border-color:#7f1d1d':''}${(u.id==='kitnet_financiar'||u.id==='apto_financiar')?';border-color:var(--purple)':''}">
+      <div class="info"><div class="name">${u.emoji} ${u.nome}</div>
+      <div class="desc">${u.desc.replace(/\n/g,'<br>')}${hint?'<br><span style="color:var(--purple)">'+hint+'</span>':''}</div></div>
+      <button class="${u.cor}" onclick="buyUpgrade('${u.id}')" ${jatem||semreq?'disabled':''}>R$${fmt(u.preco)}</button>
+    </div>`;
+  }).join('');
+}
+function buyUpgrade(id){
+  const u=UPGRADES.find(x=>x.id===id);if(!u)return;
+  if(u.unico&&G.upgrades[id]){showModal('Já possui','Você já tem este item.');return;}
+  if(u.req&&!u.req()){showModal('Bloqueado',u.reqMsg||'Requisito não cumprido.');return;}
+  if(G.money<u.preco){showModal('Sem grana','Precisa de R$'+fmt(u.preco)+'.\nSaldo: R$'+fmt(G.money));return;}
+  sfx('buy');G.money-=u.preco;G.gastosD+=u.preco;G.gastosDetalhe.push({desc:u.emoji+' '+u.nome,v:u.preco});if(u.unico)G.upgrades[id]=true;u.acao();updateUI();renderLoja();
+}
+
+// ── AUDIO ─────────────────────────────────────────────────
+let audioCtx=null,mGain=null,mpRunning=false,songIdx=0;
+function toggleMute(){G.muted=!G.muted;document.getElementById('mute-btn').textContent=G.muted?'🔇':'🔊';if(mGain)mGain.gain.value=G.muted?0:0.12;}
+function startMusic(){try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();mGain=audioCtx.createGain();mGain.gain.value=0.12;mGain.connect(audioCtx.destination);mpRunning=true;playBGM();}catch(e){}}
+function stopMusic(){mpRunning=false;if(audioCtx){try{audioCtx.close();}catch(e){}}audioCtx=null;mGain=null;}
+function note(f,s,d,v,type,dest){if(!audioCtx)return;const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(dest||audioCtx.destination);o.type=type||'square';o.frequency.value=f;const t=audioCtx.currentTime;g.gain.setValueAtTime(0,t+s);g.gain.linearRampToValueAtTime(v,t+s+0.01);g.gain.linearRampToValueAtTime(0,t+s+d-0.02);o.start(t+s);o.stop(t+s+d);}
+
+// 8 distinct songs, longer durations to reduce repetition
+const SONGS=[
+  // 1 — samba subido
+  {dur:8.0,mel:[[329,0,.2],[392,.3,.2],[440,.6,.2],[392,.9,.2],[349,1.2,.2],[329,1.5,.2],[294,1.8,.2],[261,2.1,.4],[294,2.6,.2],[329,2.9,.2],[349,3.2,.2],[329,3.5,.2],[261,3.8,.4],[0,4.3,.1],[294,4.5,.2],[329,4.8,.2],[392,5.1,.2],[440,5.4,.2],[392,5.7,.4],[329,6.1,.2],[294,6.4,.2],[261,6.7,.2],[294,7.0,.4],[329,7.5,.4]],bas:[[130,0,.4],[130,.6,.4],[174,1.2,.4],[174,1.8,.4],[196,2.4,.4],[174,3,.4],[130,3.6,.4],[130,4.2,.4],[174,4.8,.4],[196,5.4,.4],[174,6.0,.4],[130,6.6,.4],[174,7.2,.4]]},
+  // 2 — melancólico menor longo
+  {dur:9.0,mel:[[261,0,.4],[311,.5,.4],[349,1.0,.4],[370,1.5,.4],[392,2.0,.8],[370,3.0,.4],[349,3.5,.4],[311,4.0,.8],[261,5.0,.4],[0,5.5,.1],[294,5.7,.4],[311,6.2,.4],[261,6.7,.8],[311,7.7,.4],[349,8.2,.4],[311,8.7,.6]],bas:[[196,0,.5],[196,.6,.5],[174,1.2,.5],[174,1.8,.5],[165,2.4,.5],[165,3.0,.5],[174,3.6,.5],[196,4.2,.5],[196,4.8,.5],[174,5.4,.5],[165,6.0,.5],[174,6.6,.5],[196,7.2,.5],[174,7.8,.5],[165,8.4,.5]]},
+  // 3 — marcha heróica
+  {dur:7.0,mel:[[440,0,.18],[440,.22,.18],[440,.44,.18],[349,.66,.36],[523,1.1,.18],[494,1.32,.18],[440,1.54,.36],[392,2.0,.18],[440,2.22,.18],[494,2.44,.18],[523,2.66,.36],[440,3.1,.18],[392,3.32,.18],[349,3.54,.36],[261,4.0,.5],[329,4.6,.3],[392,5.0,.3],[440,5.4,.3],[494,5.8,.3],[440,6.2,.3],[392,6.6,.4]],bas:[[110,0,.35],[110,.44,.35],[138,.88,.35],[138,1.32,.35],[110,1.76,.35],[110,2.2,.35],[130,2.64,.35],[110,3.08,.35],[98,3.52,.35],[110,3.96,.35],[130,4.4,.35],[110,4.84,.35],[130,5.28,.35],[138,5.72,.35],[130,6.16,.35],[110,6.6,.35]]},
+  // 4 — lento triste
+  {dur:9.0,mel:[[261,0,.6],[294,.8,.6],[311,1.6,.6],[294,2.4,.6],[261,3.2,1.2],[294,4.6,.6],[311,5.4,.6],[349,6.2,.6],[294,7.0,.6],[261,7.8,1.0]],bas:[[98,0,.55],[130,.7,.55],[98,1.4,.55],[130,2.1,.55],[98,2.8,.55],[98,3.5,.55],[110,4.2,.55],[110,4.9,.55],[98,5.6,.55],[98,6.3,.55],[110,7.0,.55],[110,7.7,.55],[98,8.4,.5]]},
+  // 5 — urgente
+  {dur:6.4,mel:[[392,0,.15],[370,.19,.15],[349,.38,.15],[330,.57,.15],[311,.76,.3],[330,1.12,.15],[349,1.32,.15],[370,1.52,.15],[392,1.72,.3],[440,2.1,.15],[392,2.3,.15],[349,2.5,.15],[330,2.7,.3],[311,3.1,.15],[349,3.3,.15],[392,3.5,.3],[440,3.9,.15],[494,4.1,.15],[440,4.3,.3],[523,4.7,.2],[494,5.0,.2],[440,5.3,.2],[523,5.6,.4]],bas:[[196,0,.3],[196,.3,.3],[196,.6,.3],[185,.9,.3],[174,1.2,.3],[185,1.5,.3],[196,1.8,.3],[196,2.1,.3],[185,2.4,.3],[174,2.7,.3],[185,3.0,.3],[196,3.3,.3],[196,3.6,.3],[220,3.9,.3],[196,4.2,.3],[220,4.5,.3],[196,4.8,.3],[185,5.1,.3],[174,5.4,.3],[185,5.7,.3]]},
+  // 6 — festivo
+  {dur:7.2,mel:[[523,0,.15],[587,.22,.15],[659,.44,.15],[698,.66,.3],[784,1.1,.15],[698,1.32,.15],[659,1.54,.3],[587,2.0,.15],[523,2.22,.15],[587,2.44,.15],[659,2.66,.3],[784,3.1,.15],[698,3.32,.3],[523,3.74,.15],[587,3.96,.15],[659,4.18,.15],[784,4.4,.5],[659,5.0,.15],[587,5.22,.15],[523,5.44,.15],[659,5.66,.15],[784,5.88,.15],[659,6.1,.3],[523,6.5,.5]],bas:[[130,0,.35],[174,.45,.35],[196,.9,.35],[174,1.35,.35],[130,1.8,.35],[130,2.25,.35],[174,2.7,.35],[196,3.15,.35],[174,3.6,.35],[130,4.05,.35],[174,4.5,.35],[196,4.95,.35],[174,5.4,.35],[130,5.85,.35],[174,6.3,.35]]},
+  // 7 — sinistro lento
+  {dur:10.0,mel:[[220,0,.7],[233,1.0,.7],[246,2.0,.7],[261,3.0,1.2],[246,4.4,.7],[233,5.4,.7],[220,6.4,.7],[207,7.4,1.0],[220,8.6,.7],[233,9.4,.5]],bas:[[55,0,1.0],[55,1.1,1.0],[55,2.2,1.0],[55,3.3,1.0],[55,4.4,1.0],[55,5.5,1.0],[55,6.6,1.0],[55,7.7,1.0],[55,8.8,1.0]]},
+  // 8 — folk animado
+  {dur:7.6,mel:[[392,0,.2],[440,.28,.2],[494,.56,.2],[523,.84,.4],[494,1.3,.2],[440,1.58,.2],[392,1.86,.4],[349,2.34,.2],[392,2.62,.2],[440,2.9,.2],[494,3.18,.4],[523,3.66,.2],[587,3.94,.2],[523,4.22,.2],[494,4.5,.4],[440,5.0,.2],[392,5.28,.2],[349,5.56,.2],[392,5.84,.4],[440,6.3,.2],[494,6.58,.2],[523,6.86,.4]],bas:[[196,0,.35],[196,.56,.35],[174,1.12,.35],[174,1.68,.35],[196,2.24,.35],[196,2.8,.35],[220,3.36,.35],[196,3.92,.35],[174,4.48,.35],[174,5.04,.35],[196,5.6,.35],[196,6.16,.35],[220,6.72,.35]]},
+  // 9 — bossa serena
+  {dur:8.4,mel:[[330,0,.4],[370,.6,.4],[415,1.2,.4],[440,1.8,.8],[415,2.8,.4],[370,3.4,.4],[330,4.0,.8],[294,5.0,.4],[330,5.6,.4],[370,6.2,.4],[415,6.8,.4],[440,7.4,.6],[330,8.0,.4]],bas:[[165,0,.5],[165,.7,.5],[196,1.4,.5],[196,2.1,.5],[165,2.8,.5],[165,3.5,.5],[196,4.2,.5],[196,4.9,.5],[165,5.6,.5],[165,6.3,.5],[196,7.0,.5],[196,7.7,.5]]},
+  // 10 — reggae preguiçoso
+  {dur:8.0,mel:[[261,0,.35],[294,.5,.35],[311,1.0,.35],[329,1.5,.7],[311,2.4,.35],[294,2.9,.35],[261,3.4,.7],[0,4.2,.1],[294,4.4,.35],[311,4.9,.35],[349,5.4,.35],[370,5.9,.7],[349,6.8,.35],[311,7.3,.35],[261,7.8,.5]],bas:[[130,0,.45],[0,.5,.1],[130,.65,.45],[0,1.15,.1],[174,1.3,.45],[0,1.8,.1],[174,1.95,.45],[0,2.5,.1],[130,2.65,.45],[0,3.15,.1],[130,3.3,.45],[0,3.85,.1],[196,4.0,.45],[0,4.5,.1],[196,4.65,.45],[0,5.15,.1],[174,5.3,.45],[0,5.8,.1],[130,5.95,.45],[0,6.5,.1],[130,6.65,.45],[0,7.2,.1],[174,7.35,.45]]},
+  // 11 — valsa caipira
+  {dur:7.5,mel:[[392,0,.3],[0,.35,.05],[440,.4,.3],[0,.75,.05],[494,.8,.3],[523,1.2,.6],[494,1.9,.3],[440,2.3,.3],[392,2.7,.6],[349,3.4,.3],[0,3.75,.05],[392,3.8,.3],[0,4.15,.05],[440,4.2,.3],[494,4.6,.6],[523,5.3,.3],[587,5.7,.3],[523,6.1,.3],[494,6.5,.3],[392,6.9,.5]],bas:[[196,0,.35],[196,.4,.35],[196,.8,.35],[174,1.2,.35],[174,1.6,.35],[174,2.0,.35],[196,2.4,.35],[196,2.8,.35],[196,3.2,.35],[174,3.6,.35],[174,4.0,.35],[174,4.4,.35],[196,4.8,.35],[196,5.2,.35],[220,5.6,.35],[220,6.0,.35],[196,6.4,.35],[174,6.8,.35]]},
+  // 12 — percussivo staccato
+  {dur:6.0,mel:[[523,0,.1],[0,.15,.05],[523,.2,.1],[659,.4,.2],[0,.65,.05],[784,.7,.2],[659,.95,.1],[523,1.1,.1],[0,1.25,.05],[659,1.3,.2],[784,1.6,.4],[523,2.1,.1],[659,2.3,.1],[784,2.5,.2],[880,2.8,.4],[784,3.3,.1],[659,3.5,.1],[523,3.7,.2],[659,3.95,.1],[784,4.2,.4],[0,4.7,.1],[659,4.9,.2],[523,5.2,.2],[659,5.5,.4]],bas:[[196,0,.2],[0,.25,.05],[196,.3,.2],[0,.55,.05],[174,.6,.2],[0,.85,.05],[174,.9,.2],[0,1.15,.05],[196,1.2,.2],[196,1.6,.2],[174,2.0,.2],[196,2.4,.2],[220,2.8,.2],[196,3.2,.2],[174,3.6,.2],[196,4.0,.2],[220,4.4,.2],[196,4.8,.2],[174,5.2,.2],[196,5.6,.2]]},
+  // 13 — noturno quieto
+  {dur:11.0,mel:[[330,0,.8],[0,1,.1],[349,1.1,.8],[0,2,.1],[370,2.1,.8],[0,3.1,.1],[392,3.2,1.4],[0,4.7,.1],[370,4.9,.8],[0,5.8,.1],[349,6.0,.8],[0,6.9,.1],[330,7.1,.8],[0,8.0,.1],[311,8.2,.8],[0,9.1,.1],[330,9.3,.8],[0,10.2,.1],[349,10.4,.5]],bas:[[82,0,1.0],[82,1.1,1.0],[98,2.2,1.0],[98,3.3,1.2],[82,4.7,1.0],[82,5.8,1.0],[82,6.9,1.0],[73,8.0,1.0],[82,9.1,1.0],[82,10.2,.8]]},
+];
+function playBGM(){if(!audioCtx||!mGain||!mpRunning)return;const song=SONGS[songIdx%SONGS.length];songIdx++;song.mel.forEach(([f,s,d])=>{if(f>0)note(f,s,d,1,'square',mGain);});song.bas.forEach(([f,s,d])=>note(f,s,d,1,'triangle',mGain));setTimeout(playBGM,song.dur*1000);}
+function sfx(type){
+  if(!audioCtx||G.muted)return;
+  const dest=audioCtx.destination,ct=audioCtx.currentTime;
+  const mk=(f,s,d,v,ty)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(dest);o.type=ty||'sine';o.frequency.value=f;g.gain.setValueAtTime(0,ct+s);g.gain.linearRampToValueAtTime(v,ct+s+0.01);g.gain.linearRampToValueAtTime(0,ct+s+d-0.01);o.start(ct+s);o.stop(ct+s+d);};
+  if(type==='coin'){[[523,0,.07,.18,'sine'],[659,.09,.07,.14,'sine'],[784,.18,.12,.1,'sine'],[1047,.3,.1,.07,'sine']].forEach(([f,s,d,v,t])=>mk(f,s,d,v,t));}
+  else if(type==='fail'){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(dest);o.type='sawtooth';o.frequency.setValueAtTime(280,ct);o.frequency.linearRampToValueAtTime(110,ct+0.4);g.gain.setValueAtTime(0.13,ct);g.gain.linearRampToValueAtTime(0,ct+0.4);o.start(ct);o.stop(ct+0.4);}
+  else if(type==='buy'){[[440,0,.06,.12,'triangle'],[660,.08,.08,.09,'triangle']].forEach(([f,s,d,v,t])=>mk(f,s,d,v,t));}
+  else if(type==='eat'){[[300,0,.05,.1,'sine'],[400,.06,.05,.1,'sine'],[350,.12,.07,.08,'sine'],[500,.2,.08,.06,'sine']].forEach(([f,s,d,v,t])=>mk(f,s,d,v,t));}
+  else if(type==='shower'){for(let i=0;i<8;i++){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(dest);o.type='sine';o.frequency.value=600+Math.random()*800;const st=ct+i*0.05+Math.random()*0.03;g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(0.04,st+0.01);g.gain.linearRampToValueAtTime(0,st+0.04);o.start(st);o.stop(st+0.05);}}
+  else if(type==='sleep'){[[440,0,.3,.07,'sine'],[370,.35,.3,.06,'sine'],[330,.7,.3,.05,'sine'],[294,1.05,.5,.04,'sine']].forEach(([f,s,d,v,t])=>mk(f,s,d,v,t));}
+  else if(type==='prison'){[[880,0,.08,.15,'square'],[880,.12,.08,.15,'square'],[440,.24,.15,.15,'sawtooth'],[330,.4,.2,.12,'sawtooth'],[220,.62,.3,.1,'sawtooth']].forEach(([f,s,d,v,t])=>mk(f,s,d,v,t));}
+  else if(type==='policia'){
+    // abordagem: apito/sirene curta descendente
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(dest);
+    o.type='sawtooth';o.frequency.setValueAtTime(1200,ct);o.frequency.exponentialRampToValueAtTime(600,ct+0.3);
+    g.gain.setValueAtTime(0.2,ct);g.gain.linearRampToValueAtTime(0,ct+0.35);o.start(ct);o.stop(ct+0.4);
+    mk(880,.1,.05,.15,'square');mk(660,.18,.05,.12,'square');
+  }
+  else if(type==='tiro'){
+    // tiro: burst de ruído branco sintético
+    for(let i=0;i<3;i++){
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain(),noise=audioCtx.createOscillator();
+      o.connect(g);g.connect(dest);o.type='square';
+      o.frequency.value=80+Math.random()*120;
+      const st=ct+i*0.08;
+      g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(0.3,st+0.005);g.gain.exponentialRampToValueAtTime(0.001,st+0.12);
+      o.start(st);o.stop(st+0.13);
+    }
+    // eco
+    mk(200,.25,.2,.08,'sawtooth');mk(100,.4,.3,.05,'sawtooth');
+  }
+  else if(type==='roubo'){
+    // stab of high notes - sudden alarm
+    [[880,0,.05,.2,'square'],[0,.06,.02,0],[880,.09,.05,.2,'square'],[660,.15,.1,.15,'sawtooth'],[440,.28,.15,.12,'sawtooth'],[330,.46,.2,.1,'sawtooth']].forEach(([f,s,d,v,t])=>{if(f>0)mk(f,s,d,v,t||'square');});
+  }
+  else if(type==='intim_ok'){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(dest);o.type='square';o.frequency.setValueAtTime(80,ct);o.frequency.linearRampToValueAtTime(200,ct+0.3);g.gain.setValueAtTime(0.18,ct);g.gain.linearRampToValueAtTime(0,ct+0.35);o.start(ct);o.stop(ct+0.35);mk(300,.1,.1,.1,'sawtooth');}
+}
+initG();
+updateTitleSaveInfo(); // mostra botão "Continuar" se houver save
+</script>
+</body>
+</html>
